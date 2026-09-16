@@ -1,7 +1,7 @@
 # Release Secrets Sync
 
 `sync.py` syncs the release-workflow GitHub secrets from a local dotenv file to
-repo-level secrets on `browseros-ai/BrowserOS`.
+repo-level secrets on `slavebrowser-ai/SlaveBrowser`.
 
 The tool is intentionally allowlist-only. It does not upload every key in the
 dotenv file, and it never prints secret values. Apply mode sends values to

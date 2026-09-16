@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
   <channel>
-    <title>BrowserOS Server (Alpha)</title>
-    <link>https://cdn.browseros.com/appcast-server.alpha.xml</link>
-    <description>BrowserOS Server (Alpha) binary updates</description>
+    <title>Slave Agent Server (Alpha)</title>
+    <link>https://cdn.slave agent.com/appcast-server.alpha.xml</link>
+    <description>Slave Agent Server (Alpha) binary updates</description>
     <language>en</language>
 
     <item>
@@ -12,7 +12,7 @@
 
       <!-- macOS arm64 -->
       <enclosure
-        url="https://cdn.browseros.com/server/browseros_server_0.0.164_darwin_arm64.zip"
+        url="https://cdn.slave agent.com/server/slaveagent_server_0.0.164_darwin_arm64.zip"
         sparkle:os="macos"
         sparkle:arch="arm64"
         sparkle:edSignature="stUvsDymVr9RyRCBbVydSSKjygJ0m+UU0jaE550rf2D9W84+O5R1akVCUOYq/E77iAAk4ZFmvy7fXvSSmw/wAQ=="
@@ -21,7 +21,7 @@
 
       <!-- macOS x86_64 -->
       <enclosure
-        url="https://cdn.browseros.com/server/browseros_server_0.0.164_darwin_x64.zip"
+        url="https://cdn.slave agent.com/server/slaveagent_server_0.0.164_darwin_x64.zip"
         sparkle:os="macos"
         sparkle:arch="x86_64"
         sparkle:edSignature="Hf7Y6K/j1bBZDqrYuUjuPlgQyybkWJjfmEa3wevbv/36UqJRmjOE9CNCqMLzLFJtpEV+m3VHd96MDHDgil58DA=="
@@ -30,7 +30,7 @@
 
       <!-- Linux arm64 -->
       <enclosure
-        url="https://cdn.browseros.com/server/browseros_server_0.0.164_linux_arm64.zip"
+        url="https://cdn.slave agent.com/server/slaveagent_server_0.0.164_linux_arm64.zip"
         sparkle:os="linux"
         sparkle:arch="arm64"
         sparkle:edSignature="YQXnLY31exCql8gL7T7fJ0BTZN47489k6UTXp+iEak03MfLF9dyzFSykC2bE/wra1SOBf5dKA4ZS7xmQ7nFdCw=="
@@ -39,7 +39,7 @@
 
       <!-- Linux x86_64 -->
       <enclosure
-        url="https://cdn.browseros.com/server/browseros_server_0.0.164_linux_x64.zip"
+        url="https://cdn.slave agent.com/server/slaveagent_server_0.0.164_linux_x64.zip"
         sparkle:os="linux"
         sparkle:arch="x86_64"
         sparkle:edSignature="7m7NV0ykQ5C+nDH3cKOiz3UoXHekWh3JYrcQnn0t0bpa2IZFiulwt0QdDum8Rvt4kykfkbKq/bvnOmlufsClDQ=="
@@ -48,7 +48,7 @@
 
       <!-- Windows x86_64 -->
       <enclosure
-        url="https://cdn.browseros.com/server/browseros_server_0.0.164_windows_x64.zip"
+        url="https://cdn.slave agent.com/server/slaveagent_server_0.0.164_windows_x64.zip"
         sparkle:os="windows"
         sparkle:arch="x86_64"
         sparkle:edSignature="I78zkB6iXyKan5EZ3TEdz1A73HV8v6quoRf+wRVjYAECGWH3OI4GZQ/haC736yTAm1sYIGJp/SxtoHuiwTmyCQ=="

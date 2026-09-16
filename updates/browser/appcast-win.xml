@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
   <channel>
-    <title>BrowserOS Windows Updates</title>
-    <link>https://cdn.browseros.com/appcast-win.xml</link>
+    <title>Slave Agent Windows Updates</title>
+    <link>https://cdn.slave agent.com/appcast-win.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
     <item>
-      <title>BrowserOS - 0.50.3</title>
+      <title>Slave Agent - 0.50.3</title>
       <description sparkle:format="plain-text">
       </description>
       <sparkle:version>10000.0.50.3.0</sparkle:version>
       <sparkle:shortVersionString>0.50.3</sparkle:shortVersionString>
       <pubDate>Sun, 06 Sep 2026 09:28:47 +0000</pubDate>
-      <link>https://www.browseros.com/</link>
+      <link>https://www.slave agent.com/</link>
       <enclosure
-        url="http://cdn.browseros.com/releases/browseros/0.50.3/win/BrowserOS_v0.50.3_x64_installer.exe"
+        url="http://cdn.slave agent.com/releases/slave agent/0.50.3/win/SlaveAgent_v0.50.3_x64_installer.exe"
         sparkle:os="windows"
         sparkle:edSignature="XDdY6rO9TnDESzq9zQupqDKpyQ3g7OQY6e2fkAgITrk+2FLxhDoCJdjq0HrmI/bU1qXlqG0pXErYOaYxNDUrBw=="
         length="152070712"

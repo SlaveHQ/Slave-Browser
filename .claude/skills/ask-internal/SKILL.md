@@ -1,6 +1,6 @@
 ---
 name: ask-internal
-description: Answer questions about BrowserOS internal stuff (setup, features, architecture, design decisions) by reading the private internal-docs submodule and the codebase. Use for "how do I X", "where is Y", "what is the deal with Z", or any question that mixes ops/setup knowledge with code knowledge. Can execute steps with per-command confirmation.
+description: Answer questions about SlaveBrowser internal stuff (setup, features, architecture, design decisions) by reading the private internal-docs submodule and the codebase. Use for "how do I X", "where is Y", "what is the deal with Z", or any question that mixes ops/setup knowledge with code knowledge. Can execute steps with per-command confirmation.
 allowed-tools: Bash, Read, Grep, Glob
 disable-model-invocation: true
 ---
@@ -21,7 +21,7 @@ Answer team-internal questions by reading `.internal-docs/` and the codebase, sy
 ## Hard rules — never do these
 
 - NEVER execute a state-mutating command without per-command `y` confirmation from the user.
-- NEVER edit BrowserOS code or docs in response to an ask-internal question. The skill answers; it does not write files.
+- NEVER edit SlaveBrowser code or docs in response to an ask-internal question. The skill answers; it does not write files.
 - NEVER guess. If grep finds nothing useful in docs or code, say so plainly.
 - NEVER run this skill if `.internal-docs/` is missing. Stop with the init command.
 - NEVER cite a file or line number you have not actually read.
@@ -71,11 +71,11 @@ grep -rni --include='*.md' '<keyword>' .internal-docs/
 
 Search each keyword separately. Collect top hits by relevance (more keyword matches = higher).
 
-**Codebase (skip vendored Chromium and `node_modules`):**
+**Codebase (skip vendored Slave Browser and `node_modules`):**
 
 ```bash
 grep -rni --include='*.ts' --include='*.tsx' --include='*.js' --include='*.json' --include='*.sh' \
-     --exclude-dir=node_modules --exclude-dir=chromium --exclude-dir=.grove \
+     --exclude-dir=node_modules --exclude-dir=slave browser --exclude-dir=.grove \
      '<keyword>' packages/ scripts/ .config/ .github/
 ```
 
@@ -124,7 +124,7 @@ Every "X is at Y" claim in the answer must point to a file:line that the skill a
 
 If a doc says one thing and the code says another, surface the conflict explicitly:
 
-> The setup runbook (`setup/dogfood-profile.md:23`) says to delete `~/.cache/browseros/dogfood`, but the actual code path in `packages/cli/src/cleanup.ts:47` removes `~/.local/share/browseros/dogfood`. The doc looks stale. Recommend updating it.
+> The setup runbook (`setup/dogfood-profile.md:23`) says to delete `~/.cache/slavebrowser/dogfood`, but the actual code path in `packages/cli/src/cleanup.ts:47` removes `~/.local/share/slavebrowser/dogfood`. The doc looks stale. Recommend updating it.
 
 ## Common Mistakes
 
@@ -145,7 +145,7 @@ If a doc says one thing and the code says another, surface the conflict explicit
 **Never:**
 - Cite a file:line you haven't read.
 - Run mutations without per-command confirmation.
-- Modify BrowserOS code or docs from this skill.
+- Modify SlaveBrowser code or docs from this skill.
 
 **Always:**
 - Pre-flight check before any search.

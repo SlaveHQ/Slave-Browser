@@ -4,14 +4,14 @@ contact_links:
     url: https://discord.gg/YKwjt5vuKr
     about: Join our Discord for help and discussions!
   - name: 💼 Slack
-    url: https://dub.sh/browserOS-slack
+    url: https://dub.sh/slaveAgent-slack
     about: Join our Slack for help and queries!
   - name: 🏢 Enterprise deployment
-    url: mailto:founders@browseros.com?subject=BrowserOS%20neo%20enterprise%20deployment
-    about: Rolling BrowserOS neo out across a team? Talk to the founders.
+    url: mailto:founders@slave agent.com?subject=Slave Agent%20neo%20enterprise%20deployment
+    about: Rolling Slave Agent neo out across a team? Talk to the founders.
   - name: 💡 Feature Requests
-    url: https://github.com/browseros-ai/BrowserOS/issues/99
+    url: https://github.com/slave agent-ai/Slave Agent/issues/99
     about: Have an idea? Share it here and vote on others
   - name: 📚 Documentation
-    url: https://docs.browseros.com/
-    about: Find setup guides and learn how to use BrowserOS
+    url: https://docs.slave agent.com/
+    about: Find setup guides and learn how to use Slave Agent

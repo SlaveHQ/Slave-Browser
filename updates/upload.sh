@@ -8,18 +8,18 @@ REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 echo "=== CDN feed upload ==="
 echo
 echo "Browser appcasts:"
-echo "  1) BrowserOS macOS arm64        (appcast.xml)"
-echo "  2) BrowserOS macOS x64          (appcast-x86_64.xml)"
-echo "  3) BrowserOS Windows x64        (appcast-win.xml)"
-echo "  4) BrowserOS Windows arm64      (appcast-win-arm64.xml)"
+echo "  1) SlaveBrowser macOS arm64        (appcast.xml)"
+echo "  2) SlaveBrowser macOS x64          (appcast-x86_64.xml)"
+echo "  3) SlaveBrowser Windows x64        (appcast-win.xml)"
+echo "  4) SlaveBrowser Windows arm64      (appcast-win-arm64.xml)"
 echo "  5) BrowserClaw macOS arm64      (appcast-claw.xml)"
 echo "  6) BrowserClaw macOS x64        (appcast-claw-x86_64.xml)"
 echo "  7) BrowserClaw Windows x64      (appcast-claw-win.xml)"
 echo "  8) BrowserClaw Windows arm64    (appcast-claw-win-arm64.xml)"
 echo
 echo "Server appcasts:"
-echo "  9) BrowserOS Production         (appcast-server.xml)"
-echo " 10) BrowserOS Alpha              (appcast-server.alpha.xml)"
+echo "  9) SlaveBrowser Production         (appcast-server.xml)"
+echo " 10) SlaveBrowser Alpha              (appcast-server.alpha.xml)"
 echo " 11) BrowserClaw Production       (appcast-claw-server.xml)"
 echo " 12) BrowserClaw Alpha            (appcast-claw-server.alpha.xml)"
 echo
@@ -94,8 +94,8 @@ for selection in "${selections[@]}"; do
     esac
 done
 
-cd "$REPO_ROOT/packages/browseros"
-command=(uv run browseros release feeds publish-local "${keys[@]}")
+cd "$REPO_ROOT/packages/slavebrowser"
+command=(uv run slavebrowser release feeds publish-local "${keys[@]}")
 "${command[@]}"
 
 echo

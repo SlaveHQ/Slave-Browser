@@ -1,13 +1,13 @@
 ---
 name: write-docs
-description: Write BrowserOS feature documentation. Use when the user wants to create or update documentation for a BrowserOS feature. This skill explores the codebase to understand features and writes concise Mintlify MDX docs.
+description: Write SlaveBrowser feature documentation. Use when the user wants to create or update documentation for a SlaveBrowser feature. This skill explores the codebase to understand features and writes concise Mintlify MDX docs.
 allowed-tools: Read, Grep, Glob, Bash, Task, Write, Edit
 disable-model-invocation: true
 ---
 
-# Write BrowserOS Documentation
+# Write SlaveBrowser Documentation
 
-This skill helps write documentation for BrowserOS features. It follows a structured workflow to create high-quality, concise documentation pages.
+This skill helps write documentation for SlaveBrowser features. It follows a structured workflow to create high-quality, concise documentation pages.
 
 ## Workflow
 
@@ -16,7 +16,7 @@ This skill helps write documentation for BrowserOS features. It follows a struct
 Before writing documentation, explore the codebase to understand the feature:
 
 1. **Ask the user** which feature they want to document
-2. **Search the codebase** at `../browseros-server` (sibling directory) to find relevant code:
+2. **Search the codebase** at `../slavebrowser-server` (sibling directory) to find relevant code:
    - Use `Grep` to search for feature-related keywords
    - Use `Glob` to find relevant files
    - Read key files to understand how the feature works
@@ -73,7 +73,7 @@ Tell the user to run `mint dev` in the `docs/` directory to preview the document
 ## Documentation Style Guide
 
 - **Concise**: Maximum one page length
-- **Clear**: Write for first-time BrowserOS users
+- **Clear**: Write for first-time SlaveBrowser users
 - **Practical**: Focus on how to use the feature, not internal implementation details
 - **Visual**: Use screenshots to show, not just tell
 - **No fluff**: Skip unnecessary introductions or conclusions
@@ -83,16 +83,16 @@ Tell the user to run `mint dev` in the `docs/` directory to preview the document
 ```mdx
 ---
 title: "Ad Blocking"
-description: "BrowserOS blocks 10x more ads than Chrome out of the box"
+description: "SlaveBrowser blocks 10x more ads than Chrome out of the box"
 ---
 
-BrowserOS ships with built-in ad blocking that works immediately—no extensions required.
+SlaveBrowser ships with built-in ad blocking that works immediately—no extensions required.
 
 ## How It Works
 
 [2-3 paragraphs explaining the mechanics]
 
-## BrowserOS vs Chrome
+## SlaveBrowser vs Chrome
 
 [Comparison with data/screenshots]
 
@@ -105,13 +105,13 @@ BrowserOS ships with built-in ad blocking that works immediately—no extensions
 
 - **Docs location**: `docs/`
 - **Images**: `docs/images/`
-- **Feature code**: `../browseros-server/` (sibling directory)
+- **Feature code**: `../slavebrowser-server/` (sibling directory)
 - **Config**: `docs/docs.json`
 
 ## Core Features to Document
 
 The user mentioned these features need documentation:
-1. BrowserOS MCP Server
-2. Connecting other MCPs to BrowserOS assistant
+1. SlaveBrowser MCP Server
+2. Connecting other MCPs to SlaveBrowser assistant
 3. Scheduled tasks
 4. [Additional features discovered in codebase]

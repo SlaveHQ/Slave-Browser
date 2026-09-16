@@ -1,41 +1,39 @@
 <div align="center">
-<img width="693" height="415" alt="BrowserOS neo: the missing browser for your AI agents" src="https://github.com/user-attachments/assets/8129f9c8-e8f4-4afe-834a-91397121d833" />
+<img width="693" height="415" alt="SlaveBrowser neo: the missing browser for your AI agents" src="https://github.com/user-attachments/assets/8129f9c8-e8f4-4afe-834a-91397121d833" />
 
 <br></br>
 <a href="https://discord.gg/YKwjt5vuKr"><img src="https://img.shields.io/badge/Discord-555?logo=discord" alt="Discord" /></a>
-<a href="https://dub.sh/browserOS-slack"><img src="https://img.shields.io/badge/Slack-555?logo=slack" alt="Slack" /></a>
-<a href="https://x.com/browserOS_ai"><img src="https://img.shields.io/badge/@browserOS__ai-555?logo=x" alt="X / Twitter" /></a>
-<a href="https://github.com/browseros-ai/BrowserOS"><img src="https://img.shields.io/github/stars/browseros-ai/BrowserOS?style=flat&logo=github&label=stars&color=4c71f2" alt="GitHub stars" /></a>
+<a href="https://dub.sh/slaveAgent-slack"><img src="https://img.shields.io/badge/Slack-555?logo=slack" alt="Slack" /></a>
+<a href="https://x.com/slaveAgent_ai"><img src="https://img.shields.io/badge/@slaveAgent__ai-555?logo=x" alt="X / Twitter" /></a>
+<a href="https://github.com/slavebrowser-ai/SlaveBrowser"><img src="https://img.shields.io/github/stars/slavebrowser-ai/SlaveBrowser?style=flat&logo=github&label=stars&color=4c71f2" alt="GitHub stars" /></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-555" alt="AGPL-3.0" /></a>
 <br></br>
 
-<a href="https://www.producthunt.com/products/browseros_ai?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-browseros-neo" target="_blank" rel="noopener noreferrer"><picture><source media="(prefers-color-scheme: dark)" srcset="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1031913&amp;theme=dark&amp;t=1786088428884" /><img alt="BrowserOS neo - The Missing Browser for Claude, Cowork &amp; Codex | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1031913&amp;theme=light&amp;t=1786088428884" /></picture></a>
-<a href="https://trendshift.io/repositories/16468?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-16468" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/16468/daily?language=TypeScript" alt="browseros-ai%2FBrowserOS | Trendshift" width="250" height="55"/></a>
+<a href="https://www.producthunt.com/products/slaveagent_ai?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-slavebrowser-neo" target="_blank" rel="noopener noreferrer"><picture><source media="(prefers-color-scheme: dark)" srcset="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1031913&amp;theme=dark&amp;t=1786088428884" /><img alt="SlaveBrowser neo - The Missing Browser for Claude, Cowork &amp; Codex | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1031913&amp;theme=light&amp;t=1786088428884" /></picture></a>
+<a href="https://trendshift.io/repositories/16468?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-16468" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/16468/daily?language=TypeScript" alt="slavebrowser-ai%2FSlaveAgent | Trendshift" width="250" height="55"/></a>
 <br></br>
 
-<a href="https://cdn.browseros.com/download/BrowserOS_neo.dmg"><img src="https://img.shields.io/badge/Download-macOS-black?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS" /></a>
-<a href="https://cdn.browseros.com/download/BrowserOS_neo_installer.exe"><img src="https://img.shields.io/badge/Download-Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows" /></a>
+<a href="https://cdn.slavebrowser.com/download/SlaveAgent_neo.dmg"><img src="https://img.shields.io/badge/Download-macOS-black?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS" /></a>
+<a href="https://cdn.slavebrowser.com/download/SlaveAgent_neo_installer.exe"><img src="https://img.shields.io/badge/Download-Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows" /></a>
 
-**[Website](https://www.browseros.com)** · **[Docs](https://docs.browseros.com)** · **[Enterprise](mailto:founders@browseros.com?subject=Enterprise%3A%20BrowserOS%20neo&body=Hi%2C%0A%0AWe%27re%20looking%20at%20BrowserOS%20neo%20for%20our%20team.%0A%0ACompany%3A%0ATeam%20size%3A%0AWhat%20we%20want%20to%20automate%3A)**
+**[Website](https://www.slavebrowser.com)** · **[Docs](https://docs.slavebrowser.com)** · **[Enterprise](mailto:founders@slavebrowser.com?subject=Enterprise%3A%20SlaveAgent%20neo&body=Hi%2C%0A%0AWe%27re%20looking%20at%20SlaveAgent%20neo%20for%20our%20team.%0A%0ACompany%3A%0ATeam%20size%3A%0AWhat%20we%20want%20to%20automate%3A)**
 
 Free · Open source · Everything runs on your machine
 
 </div>
 
-A second browser, just for your AI agents. Import your logins from Chrome in one click, connect Claude Code, Codex, or any MCP agent, and hand off your web tasks. Agents run in parallel in their own tabs. You watch live, or replay any session like a video.
-
-BrowserOS neo is not a Chrome replacement. It is a secondary browser that sits next to Chrome, made friendly to agents.
+Slave Agent: The AI agent that can actually work on browser tasks or use the browser with any LLM you have. Import your logins from Chrome in one click, connect Claude Code, Codex, or any MCP agent, and hand off your web tasks. Agents run in parallel in their own tabs. You watch live, or replay any session like a video.
 
 ## Get started
 
-### 1. Install BrowserOS neo
+### 1. Install SlaveBrowser neo
 
 ```sh
-brew tap browseros-ai/tap
-brew install --cask browseros-neo
+brew tap slavebrowser-ai/tap
+brew install --cask slavebrowser-neo
 ```
 
-Prefer a direct download? Grab it for [macOS](https://cdn.browseros.com/download/BrowserOS_neo.dmg) or [Windows](https://cdn.browseros.com/download/BrowserOS_neo_installer.exe).
+Prefer a direct download? Grab it for [macOS](https://cdn.slavebrowser.com/download/SlaveAgent_neo.dmg) or [Windows](https://cdn.slavebrowser.com/download/SlaveAgent_neo_installer.exe).
 
 ### 2. Import from Chrome
 
@@ -43,7 +41,7 @@ One click brings over your logins, bookmarks and extensions. Your agents work wi
 
 ### 3. Connect your agent
 
-BrowserOS neo finds Claude Code, Codex, Cursor, VS Code, OpenClaw and Hermes on your machine. Connect any of them with one click.
+SlaveBrowser neo finds Claude Code, Codex, Cursor, VS Code, OpenClaw and Hermes on your machine. Connect any of them with one click.
 
 ### 4. Give it a task
 
@@ -67,104 +65,104 @@ Anything that needs a logged-in browser:
 <tr>
 <td width="40%" valign="middle">
 <h4>Live dashboard</h4>
-Your new tab shows every agent working right now: which site it's on, what it's doing, how far along. <a href="https://docs.browseros.com/neo/cockpit">Docs</a>
+Your new tab shows every agent working right now: which site it's on, what it's doing, how far along. <a href="https://docs.slavebrowser.com/neo/cockpit">Docs</a>
 </td>
 <td width="60%">
-<img src="docs/images/browserclaw--dashboard-populated.png" alt="BrowserOS neo dashboard showing agent sessions and recent activity" width="100%" />
+<img src="docs/images/browserclaw--dashboard-populated.png" alt="SlaveBrowser neo dashboard showing agent sessions and recent activity" width="100%" />
 </td>
 </tr>
 <tr>
 <td width="40%" valign="middle">
 <h4>One-click connect</h4>
-Automatically connects to every harness. We built tools optimized for web use! <a href="https://docs.browseros.com/neo/mcp">Docs</a>
+Automatically connects to every harness. We built tools optimized for web use! <a href="https://docs.slavebrowser.com/neo/mcp">Docs</a>
 </td>
 <td width="60%">
-<img src="docs/images/browserclaw--mcp-install-board.png" alt="BrowserOS neo MCP connect board with one-click install for supported AI tools" width="100%" />
+<img src="docs/images/browserclaw--mcp-install-board.png" alt="SlaveBrowser neo MCP connect board with one-click install for supported AI tools" width="100%" />
 </td>
 </tr>
 <tr>
 <td width="40%" valign="middle">
 <h4>Replay every session</h4>
-Every session is saved as a scrubbable video on your disk with a step-by-step action timeline. Rewind and see exactly what happened. <a href="https://docs.browseros.com/neo/audit-and-replay">Docs</a>
+Every session is saved as a scrubbable video on your disk with a step-by-step action timeline. Rewind and see exactly what happened. <a href="https://docs.slavebrowser.com/neo/audit-and-replay">Docs</a>
 </td>
 <td width="60%">
-<img src="docs/images/browserclaw--replay-scrubber.png" alt="BrowserOS neo replay view with video scrubber and action timeline" width="100%" />
+<img src="docs/images/browserclaw--replay-scrubber.png" alt="SlaveBrowser neo replay view with video scrubber and action timeline" width="100%" />
 </td>
 </tr>
 </table>
 
-- **Your logins.** Agents automate your real work using your logged-in accounts, not a blank sandbox. [How it works](https://docs.browseros.com/neo/how-it-works)
+- **Your logins.** Agents automate your real work using your logged-in accounts, not a blank sandbox. [How it works](https://docs.slavebrowser.com/neo/how-it-works)
 - **Parallel agents.** Fire off several tasks at once. Each agent works in its own tab while you keep browsing.
-- **Fewer tokens.** For the same task, BrowserOS neo uses fewer tokens than the alternatives, such as Claude's Chrome extension or the Codex browser.
-- **Local-only, privacy-first.** Sessions, screenshots, and history live under `~/.browserclaw/` and never leave your machine. [Privacy](https://docs.browseros.com/neo/privacy)
+- **Fewer tokens.** For the same task, SlaveBrowser neo uses fewer tokens than the alternatives, such as Claude's Chrome extension or the Codex browser.
+- **Local-only, privacy-first.** Sessions, screenshots, and history live under `~/.browserclaw/` and never leave your machine. [Privacy](https://docs.slavebrowser.com/neo/privacy)
 
-## Why BrowserOS neo over the alternatives?
+## Why SlaveBrowser neo over the alternatives?
 
-- **Not a headless driver.** Playwright and agent-browser spin up a fresh Chrome subprocess with no logins. Great for CI, useless for real work which requires your logged-in state like "read my inbox." BrowserOS neo imports your logins with one click and persists them across sessions.
-- **Not a cloud browser.** Cloud browsers (like browser-use, browserbase) run in a datacenter, so logging into your accounts is a pain, and sites like Twitter and LinkedIn block you because you are on a datacenter IP. BrowserOS neo runs on your machine, on `127.0.0.1`.
-- **Not a locked-in AI browser.** Atlas, Comet, and Dia only work with their own AI. BrowserOS neo works with the agents you already use and pay for: Claude Code, Cowork, Codex, Cursor, and others.
+- **Not a headless driver.** Playwright and agent-browser spin up a fresh Chrome subprocess with no logins. Great for CI, useless for real work which requires your logged-in state like "read my inbox." SlaveBrowser neo imports your logins with one click and persists them across sessions.
+- **Not a cloud browser.** Cloud browsers (like browser-use, browserbase) run in a datacenter, so logging into your accounts is a pain, and sites like Twitter and LinkedIn block you because you are on a datacenter IP. SlaveBrowser neo runs on your machine, on `127.0.0.1`.
+- **Not a locked-in AI browser.** Atlas, Comet, and Dia only work with their own AI. SlaveBrowser neo works with the agents you already use and pay for: Claude Code, Cowork, Codex, Cursor, and others.
 
-## Also in this repo: BrowserOS
+## Also in this repo: SlaveBrowser
 
 <table>
 <tr>
 <td width="110" align="center" valign="middle">
-<img src="packages/browseros/resources/browseros/icons/product_logo_192.png" alt="" width="72" />
+<img src="packages/slavebrowser/resources/slavebrowser/icons/product_logo_192.png" alt="" width="72" />
 </td>
 <td valign="middle">
-<h3>BrowserOS, the AI browser for humans</h3>
-A Chromium fork with an AI agent built into every new tab, for when <b>you</b> are the one browsing. Bring your own AI keys or run everything locally with Ollama.
+<h3>SlaveBrowser, the AI browser for humans</h3>
+A Slave Browser fork with an AI agent built into every new tab, for when <b>you</b> are the one browsing. Bring your own AI keys or run everything locally with Ollama.
 <br><br>
-<b><a href="README.BrowserOS.md">Read about BrowserOS</a></b> &nbsp;·&nbsp; <a href="https://www.browseros.com/browseros/">Website</a> &nbsp;·&nbsp; <a href="https://docs.browseros.com/browseros">Docs</a>
+<b><a href="README.SlaveBrowser.md">Read about SlaveBrowser</a></b> &nbsp;·&nbsp; <a href="https://www.slavebrowser.com/slavebrowser/">Website</a> &nbsp;·&nbsp; <a href="https://docs.slavebrowser.com/slavebrowser">Docs</a>
 </td>
 </tr>
 </table>
 
 ## FAQ
 
-**What's the difference between BrowserOS neo and BrowserOS?**
-BrowserOS neo is a browser your AI drives. BrowserOS is a browser you drive, with an AI agent built in. Both ship from this repo and run side by side. Keep your daily browser, and let agents work in neo.
+**What's the difference between SlaveBrowser neo and SlaveBrowser?**
+SlaveBrowser neo is a browser your AI drives. SlaveBrowser is a browser you drive, with an AI agent built in. Both ship from this repo and run side by side. Keep your daily browser, and let agents work in neo.
 
-**Which AI tools work with BrowserOS neo?**
+**Which AI tools work with SlaveBrowser neo?**
 Any AI that speaks MCP. Claude Code, Codex, Cursor, VS Code, Zed, OpenCode, Hermes, OpenClaw and Antigravity connect with one click.
 
 **Does anything leave my machine?**
-Your sessions, screenshots, history, and settings live under `~/.browserclaw/` and never upload. BrowserOS neo sends anonymous product-usage events (agent connect/disconnect, version, OS) to help us improve the app; it never sends URLs, page content, prompts, tool results, or screenshots. Off with one toggle in Settings. [Full policy](https://docs.browseros.com/neo/privacy).
+Your sessions, screenshots, history, and settings live under `~/.browserclaw/` and never upload. SlaveBrowser neo sends anonymous product-usage events (agent connect/disconnect, version, OS) to help us improve the app; it never sends URLs, page content, prompts, tool results, or screenshots. Off with one toggle in Settings. [Full policy](https://docs.slavebrowser.com/neo/privacy).
 
 **Do my Chrome extensions and bookmarks work?**
-Yes. Both browsers are Chromium forks, so Chrome extensions work and your bookmarks, passwords, and settings import in one click.
+Yes. Both browsers are Slave Browser forks, so Chrome extensions work and your bookmarks, passwords, and settings import in one click.
 
 **What platforms are supported?**
-BrowserOS neo runs on macOS and Windows. BrowserOS runs on macOS, Windows, and Linux. System requirements match Google Chrome.
+SlaveBrowser neo runs on macOS and Windows. SlaveBrowser runs on macOS, Windows, and Linux. System requirements match Google Chrome.
 
 ## Get help
 
-- [Discord](https://discord.gg/YKwjt5vuKr) · [Slack](https://dub.sh/browserOS-slack)
-- [Report a bug](https://github.com/browseros-ai/BrowserOS/issues)
-- [BrowserOS neo docs](https://docs.browseros.com) · [BrowserOS docs](https://docs.browseros.com/browseros)
-- Enterprise deployment: [founders@browseros.com](mailto:founders@browseros.com?subject=Enterprise%3A%20BrowserOS%20neo&body=Hi%2C%0A%0AWe%27re%20looking%20at%20BrowserOS%20neo%20for%20our%20team.%0A%0ACompany%3A%0ATeam%20size%3A%0AWhat%20we%20want%20to%20automate%3A)
+- [Discord](https://discord.gg/YKwjt5vuKr) · [Slack](https://dub.sh/slaveAgent-slack)
+- [Report a bug](https://github.com/slavebrowser-ai/SlaveBrowser/issues)
+- [SlaveBrowser neo docs](https://docs.slavebrowser.com) · [SlaveBrowser docs](https://docs.slavebrowser.com/slavebrowser)
+- Enterprise deployment: [founders@slavebrowser.com](mailto:founders@slavebrowser.com?subject=Enterprise%3A%20SlaveAgent%20neo&body=Hi%2C%0A%0AWe%27re%20looking%20at%20SlaveAgent%20neo%20for%20our%20team.%0A%0ACompany%3A%0ATeam%20size%3A%0AWhat%20we%20want%20to%20automate%3A)
 
 ## For developers
 
-Both browsers ship from this monorepo. Two main subsystems: the **browser** (Chromium fork, C++ and Python) and the **agent platform** (TypeScript, Rust and Go).
+Both browsers ship from this monorepo. Two main subsystems: the **browser** (Slave Browser fork, C++ and Python) and the **agent platform** (TypeScript, Rust and Go).
 
 ### Architecture
 
 ```
-BrowserOS/
-├── packages/browseros/              # Chromium fork + build system (Python)
-│   ├── chromium_patches/            # Patches applied to Chromium source
+SlaveBrowser/
+├── packages/slavebrowser/              # Slave Browser fork + build system (Python)
+│   ├── slavebrowser_patches/            # Patches applied to Slave Browser source
 │   ├── build/                       # Build CLI and modules
 │   └── resources/                   # Icons, entitlements, signing
 │
-└── packages/browseros-agent/        # Agent platform (TypeScript / Rust / Go)
+└── packages/slavebrowser-agent/        # Agent platform (TypeScript / Rust / Go)
     ├── apps/
-    │   ├── claw-server-rust/        # BrowserOS neo backend: MCP endpoint + JSON API (Rust)
-    │   ├── claw-app/                # BrowserOS neo dashboard extension (WXT + React)
-    │   ├── claw-onboard/            # BrowserOS neo onboarding flow (Vite)
-    │   ├── server/                  # BrowserOS MCP server + AI agent loop (Bun)
-    │   ├── app/                     # BrowserOS extension UI (WXT + React)
-    │   ├── app-onboard/             # BrowserOS onboarding flow (Vite)
+    │   ├── claw-server-rust/        # SlaveBrowser neo backend: MCP endpoint + JSON API (Rust)
+    │   ├── claw-app/                # SlaveBrowser neo dashboard extension (WXT + React)
+    │   ├── claw-onboard/            # SlaveBrowser neo onboarding flow (Vite)
+    │   ├── server/                  # SlaveBrowser MCP server + AI agent loop (Bun)
+    │   ├── app/                     # SlaveBrowser extension UI (WXT + React)
+    │   ├── app-onboard/             # SlaveBrowser onboarding flow (Vite)
     │   └── cli/                     # CLI tool (Go)
     │
     ├── packages/                    # Shared TypeScript packages
@@ -174,52 +172,52 @@ BrowserOS/
     │   ├── browser-mcp/             # Browser MCP tool surface
     │   ├── build-server-tools/      # Shared build tooling for server binaries and assets
     │   ├── cdp-protocol/            # CDP type bindings
-    │   ├── claw-api/                # Generated BrowserOS neo wire types
-    │   ├── claw-api-client/         # Contract-typed BrowserOS neo HTTP client
+    │   ├── claw-api/                # Generated SlaveBrowser neo wire types
+    │   ├── claw-api-client/         # Contract-typed SlaveBrowser neo HTTP client
     │   ├── onboarding-video/        # Remotion compositions for the first-run demo
     │   └── shared/                  # Shared constants
     │
     └── crates/                      # Shared Rust crates
-        ├── browseros-cdp/           # CDP bindings
-        ├── browseros-core/          # Core primitives
-        ├── browseros-mcp/           # MCP server implementation
+        ├── slavebrowser-cdp/           # CDP bindings
+        ├── slavebrowser-core/          # Core primitives
+        ├── slavebrowser-mcp/           # MCP server implementation
         ├── claw-api/                # Wire types, shared with the TypeScript package
         └── harness-integrations/    # Managed integrations for AI coding harnesses
 ```
 
 | Package | What it does |
 |---------|-------------|
-| [`packages/browseros`](packages/browseros/) | Chromium fork: patches, build system, signing |
-| [`apps/claw-server-rust`](packages/browseros-agent/apps/claw-server-rust/) | BrowserOS neo backend: MCP endpoint agents connect to, plus the API behind the dashboard |
-| [`apps/claw-app`](packages/browseros-agent/apps/claw-app/) | BrowserOS neo new-tab dashboard: watch, replay, and manage agent sessions |
-| [`apps/claw-onboard`](packages/browseros-agent/apps/claw-onboard/) | BrowserOS neo first-run onboarding |
-| [`apps/server`](packages/browseros-agent/apps/server/) | Bun server exposing the browser MCP tools and running the BrowserOS AI agent loop |
-| [`apps/app`](packages/browseros-agent/apps/app/) | BrowserOS extension: new tab, side panel chat, onboarding, settings |
-| [`apps/app-onboard`](packages/browseros-agent/apps/app-onboard/) | BrowserOS first-run onboarding |
-| [`apps/cli`](packages/browseros-agent/apps/cli/) | Go CLI: control BrowserOS from the terminal or AI coding agents |
+| [`packages/slavebrowser`](packages/slavebrowser/) | Slave Browser fork: patches, build system, signing |
+| [`apps/claw-server-rust`](packages/slavebrowser-agent/apps/claw-server-rust/) | SlaveBrowser neo backend: MCP endpoint agents connect to, plus the API behind the dashboard |
+| [`apps/claw-app`](packages/slavebrowser-agent/apps/claw-app/) | SlaveBrowser neo new-tab dashboard: watch, replay, and manage agent sessions |
+| [`apps/claw-onboard`](packages/slavebrowser-agent/apps/claw-onboard/) | SlaveBrowser neo first-run onboarding |
+| [`apps/server`](packages/slavebrowser-agent/apps/server/) | Bun server exposing the browser MCP tools and running the SlaveBrowser AI agent loop |
+| [`apps/app`](packages/slavebrowser-agent/apps/app/) | SlaveBrowser extension: new tab, side panel chat, onboarding, settings |
+| [`apps/app-onboard`](packages/slavebrowser-agent/apps/app-onboard/) | SlaveBrowser first-run onboarding |
+| [`apps/cli`](packages/slavebrowser-agent/apps/cli/) | Go CLI: control SlaveBrowser from the terminal or AI coding agents |
 
 ### Contributing
 
-We'd love your help making BrowserOS neo and BrowserOS better. Start with the [Contributing Guide](CONTRIBUTING.md), which routes you to the right path.
+We'd love your help making SlaveBrowser neo and SlaveBrowser better. Start with the [Contributing Guide](CONTRIBUTING.md), which routes you to the right path.
 
-- **BrowserOS neo** (TypeScript, React, Rust): [setup guide](packages/browseros-agent/CONTRIBUTING.md). Around 15 minutes.
-- **BrowserOS** (TypeScript, React, Bun): [setup guide](packages/browseros-agent/CONTRIBUTING.BrowserOS.md). Around 15 minutes.
+- **SlaveBrowser neo** (TypeScript, React, Rust): [setup guide](packages/slavebrowser-agent/CONTRIBUTING.md). Around 15 minutes.
+- **SlaveBrowser** (TypeScript, React, Bun): [setup guide](packages/slavebrowser-agent/CONTRIBUTING.SlaveBrowser.md). Around 15 minutes.
 - **Browser** (C++, Python): requires ~100GB of disk. See the [root guide](CONTRIBUTING.md#browser-development).
 
 ## Credits
 
-- [ungoogled-chromium](https://github.com/ungoogled-software/ungoogled-chromium): we use some of its patches for enhanced privacy. Thanks to everyone behind this project.
-- [The Chromium Project](https://www.chromium.org/): at the core of both browsers, making it possible for them to exist in the first place.
+- [ungoogled-slave browser](https://github.com/ungoogled-software/ungoogled-slave browser): we use some of its patches for enhanced privacy. Thanks to everyone behind this project.
+- [The Slave Browser Project](https://www.slave browser.org/): at the core of both browsers, making it possible for them to exist in the first place.
 
 ## Citation
 
-If you use BrowserOS or BrowserOS neo in your research or project, please cite:
+If you use SlaveBrowser or SlaveBrowser neo in your research or project, please cite:
 
 ```bibtex
-@software{browseros2025,
-  author = {Nithin Sonti and Nikhil Sonti and {BrowserOS-team}},
-  title = {BrowserOS: The open-source Agentic browser},
-  url = {https://github.com/browseros-ai/BrowserOS},
+@software{slaveagent2025,
+  author = {Nithin Sonti and Nikhil Sonti and {SlaveBrowser-team}},
+  title = {SlaveBrowser: The open-source Agentic browser},
+  url = {https://github.com/slavebrowser-ai/SlaveBrowser},
   year = {2025},
   publisher = {GitHub},
   license = {AGPL-3.0},
@@ -228,7 +226,7 @@ If you use BrowserOS or BrowserOS neo in your research or project, please cite:
 
 ## License
 
-BrowserOS neo and BrowserOS are open source under the [AGPL-3.0 license](LICENSE).
+SlaveBrowser neo and SlaveBrowser are open source under the [AGPL-3.0 license](LICENSE).
 
 Copyright &copy; 2026 Felafax, Inc.
 

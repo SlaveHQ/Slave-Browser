@@ -22,7 +22,7 @@ class DotenvParserTest(unittest.TestCase):
             "line-one\n"
             "line-two\n"
             '-----END PRIVATE KEY-----"\n'
-            "BROWSEROS_AGENT_V2_KEY='-----BEGIN KEY-----\n"
+            "SLAVEAGENT_AGENT_V2_KEY='-----BEGIN KEY-----\n"
             "agent-line\n"
             "-----END KEY-----'\n"
         )
@@ -33,7 +33,7 @@ class DotenvParserTest(unittest.TestCase):
         )
         self.assertEqual(
             "-----BEGIN KEY-----\nagent-line\n-----END KEY-----",
-            parsed["BROWSEROS_AGENT_V2_KEY"],
+            parsed["SLAVEAGENT_AGENT_V2_KEY"],
         )
         verify_dotenv_round_trip(parsed)
 
@@ -123,12 +123,12 @@ class WorkflowSecretScannerTest(unittest.TestCase):
     def test_browserclaw_build_key_is_required_and_host_is_optional(self):
         expected_consumers = {
             "VITE_CLAW_POSTHOG_KEY": (
-                "build-browseros.yml",
+                "build-slavebrowser.yml",
                 "release-browserclaw.yml",
                 "release-extensions.yml",
             ),
             "VITE_CLAW_POSTHOG_HOST": (
-                "build-browseros.yml",
+                "build-slavebrowser.yml",
                 "release-extensions.yml",
             ),
         }

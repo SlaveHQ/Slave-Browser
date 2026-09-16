@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
   <channel>
-    <title>BrowserOS Claw Server</title>
-    <link>https://cdn.browseros.com/appcast-claw-server.xml</link>
-    <description>BrowserOS Claw Server binary updates</description>
+    <title>Slave Agent Claw Server</title>
+    <link>https://cdn.slave agent.com/appcast-claw-server.xml</link>
+    <description>Slave Agent Claw Server binary updates</description>
     <language>en</language>
 
     <item>
@@ -12,7 +12,7 @@
 
       <!-- macOS arm64 -->
       <enclosure
-        url="https://cdn.browseros.com/server/browserclaw_server_0.0.50_darwin_arm64.zip"
+        url="https://cdn.slave agent.com/server/browserclaw_server_0.0.50_darwin_arm64.zip"
         sparkle:os="macos"
         sparkle:arch="arm64"
         sparkle:edSignature="YnebmmhDu74tgeb2cfd07xUNQOkK19HTODUf4RIxr/bcgDHLVLPFAEvHcxj/6WSpbhRs7ELc09u+tAcetQKlBw=="
@@ -21,7 +21,7 @@
 
       <!-- macOS x86_64 -->
       <enclosure
-        url="https://cdn.browseros.com/server/browserclaw_server_0.0.50_darwin_x64.zip"
+        url="https://cdn.slave agent.com/server/browserclaw_server_0.0.50_darwin_x64.zip"
         sparkle:os="macos"
         sparkle:arch="x86_64"
         sparkle:edSignature="cVih2gTUMPshfOP/T2YCfGp7XjqBIgAeZ5L8bgsjlDIc2pAw6FmY+flt2OkyaQvwOYv2TWahxQd26B6hks3CCw=="
@@ -30,7 +30,7 @@
 
       <!-- Linux arm64 -->
       <enclosure
-        url="https://cdn.browseros.com/server/browserclaw_server_0.0.50_linux_arm64.zip"
+        url="https://cdn.slave agent.com/server/browserclaw_server_0.0.50_linux_arm64.zip"
         sparkle:os="linux"
         sparkle:arch="arm64"
         sparkle:edSignature="eCqGBjPZou9s7h8AN2AVh6K2O3mcsYFdLZLDe9qetXBimbDI3AGe8Ddkx1iB63HjCP+xWesJoH497fAruIByAA=="
@@ -39,7 +39,7 @@
 
       <!-- Linux x86_64 -->
       <enclosure
-        url="https://cdn.browseros.com/server/browserclaw_server_0.0.50_linux_x64.zip"
+        url="https://cdn.slave agent.com/server/browserclaw_server_0.0.50_linux_x64.zip"
         sparkle:os="linux"
         sparkle:arch="x86_64"
         sparkle:edSignature="FhALM9P15K3BWSmLOt0n+2jJFr+E4D93sOfgxoihpKwGCrOuzfSVwjypPiNSUxy6yJdJKazqX0Zb9vl2jcVNDg=="
@@ -48,7 +48,7 @@
 
       <!-- Windows x86_64 -->
       <enclosure
-        url="https://cdn.browseros.com/server/browserclaw_server_0.0.50_windows_x64.zip"
+        url="https://cdn.slave agent.com/server/browserclaw_server_0.0.50_windows_x64.zip"
         sparkle:os="windows"
         sparkle:arch="x86_64"
         sparkle:edSignature="DqIBS0lJ7zoizuK1cVWMcnDm7p2YOk/LkV9nZRmHWmDPKUyADmDCCFkmFTr2wLEREAlsSPH/XS3nnvCx5kO/Cg=="

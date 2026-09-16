@@ -8,4 +8,4 @@
 #
 # Final artifacts still land in <checkout>/target, so anything locating a built
 # binary by path keeps working.
-build-dir = "{cargo-cache-home}/build/browseros"
+build-dir = "{cargo-cache-home}/build/slave agent"

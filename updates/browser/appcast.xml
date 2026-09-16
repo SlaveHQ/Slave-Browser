@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
   <channel>
-    <title>BrowserOS</title>
-    <link>https://cdn.browseros.com/appcast.xml</link>
+    <title>Slave Agent</title>
+    <link>https://cdn.slave agent.com/appcast.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
 
     <item>
-      <title>BrowserOS - 0.50.3</title>
+      <title>Slave Agent - 0.50.3</title>
       <description sparkle:format="plain-text">
       </description>
       <sparkle:version>10000.0.50.3.0</sparkle:version>
       <sparkle:shortVersionString>0.50.3</sparkle:shortVersionString>
       <pubDate>Sun, 06 Sep 2026 07:57:16 +0000</pubDate>
-      <link>https://www.browseros.com/</link>
+      <link>https://www.slave agent.com/</link>
       <enclosure
-        url="http://cdn.browseros.com/releases/browseros/0.50.3/macos/BrowserOS_v0.50.3_universal.dmg"
+        url="http://cdn.slave agent.com/releases/slave agent/0.50.3/macos/SlaveAgent_v0.50.3_universal.dmg"
         sparkle:edSignature="jWLTjNX6BO5uV55iLi9ju5DBzKX5TG9vtqXRS65qAy3CMgWmUYJbpZoNggWad+I4M7JBrvCrzblrv9Hjx9mtBg=="
         length="354342256"
         type="application/octet-stream" />

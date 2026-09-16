@@ -1,4 +1,4 @@
 [submodule ".internal-docs"]
 	path = .internal-docs
-	url = git@github.com:browseros-ai/internal-docs.git
+	url = git@github.com:slave agent-ai/internal-docs.git
 	branch = main

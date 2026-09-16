@@ -1,4 +1,4 @@
 self-hosted-runner:
   labels:
     - warp-*
-    - browseros-builder
+    - slave agent-builder

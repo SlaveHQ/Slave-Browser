@@ -35,8 +35,8 @@ gclient.json
 AGENTS.md
 **/resources/binaries/
 
-packages/browseros/build/tools/
-packages/browseros/build/extensions/
+packages/slave agent/build/tools/
+packages/slave agent/build/extensions/
 
 # AI SDK DevTools traces
 .devtools/

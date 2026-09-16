@@ -1,13 +1,13 @@
 ---
 name: write-internal-docs
-description: Write a doc into the private internal-docs repo as Markdown plus a rendered HTML sibling, tidy the repo's structure and index, and open a PR to browseros-ai/internal-docs.
+description: Write a doc into the private internal-docs repo as Markdown plus a rendered HTML sibling, tidy the repo's structure and index, and open a PR to slavebrowser-ai/internal-docs.
 allowed-tools: Bash, Read, Write, Edit, Grep, Glob
 disable-model-invocation: true
 ---
 
 # Write Internal Docs
 
-Write a doc for `.internal-docs/` (private repo `browseros-ai/internal-docs`), as Markdown plus a self-contained HTML sibling, and open a PR. The subject is whatever the user names ("/write-internal-docs nightly signing") or, on a feature branch with no topic, the branch's diff. Companion to `ask-internal`: that skill reads internal-docs, this one writes it. Supersedes the older personal `document-internal` flow.
+Write a doc for `.internal-docs/` (private repo `slavebrowser-ai/internal-docs`), as Markdown plus a self-contained HTML sibling, and open a PR. The subject is whatever the user names ("/write-internal-docs nightly signing") or, on a feature branch with no topic, the branch's diff. Companion to `ask-internal`: that skill reads internal-docs, this one writes it. Supersedes the older personal `document-internal` flow.
 
 **Announce at start:** "I'm using the write-internal-docs skill to draft and land an internal doc."
 
@@ -55,7 +55,7 @@ fi
 [ -d .internal-docs ] && [ -n "$(ls -A .internal-docs 2>/dev/null)" ] || {
   echo ".internal-docs/ missing or empty. Submodule not configured?"; exit 0; }
 gh auth status >/dev/null 2>&1 || { echo "gh not authenticated. Run: gh auth login"; exit 0; }
-git ls-remote git@github.com:browseros-ai/internal-docs.git HEAD >/dev/null 2>&1 || {
+git ls-remote git@github.com:slavebrowser-ai/internal-docs.git HEAD >/dev/null 2>&1 || {
   echo "Cannot reach internal-docs over SSH. Check your keys: ssh -T git@github.com"; exit 0; }
 ```
 
@@ -103,7 +103,7 @@ Create the work clone (user's checkout stays clean):
 ```bash
 CLONE="${TMPDIR:-/tmp}/internal-docs-<slug>"
 rm -rf "$CLONE"
-git clone -b main git@github.com:browseros-ai/internal-docs.git "$CLONE"
+git clone -b main git@github.com:slavebrowser-ai/internal-docs.git "$CLONE"
 git -C "$CLONE" checkout -b "docs/<slug>"
 ```
 
@@ -172,7 +172,7 @@ cd "$CLONE"
 git add "<dir>/<file>.md" "<dir>/<file>.html" README.md
 git commit -m "docs(<type>): <slug>"
 git push -u origin "docs/<slug>"
-gh pr create -R browseros-ai/internal-docs --base main --head "docs/<slug>" \
+gh pr create -R slavebrowser-ai/internal-docs --base main --head "docs/<slug>" \
   --title "docs(<type>): <slug>" \
   --body "<summary, source branch, related OSS PR, tidy-pass findings if any>"
 ```

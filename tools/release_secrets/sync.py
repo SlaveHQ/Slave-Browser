@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import Mapping, Sequence
 
 
-DEFAULT_REPO = "browseros-ai/BrowserOS"
+DEFAULT_REPO = "slavebrowser-ai/SlaveBrowser"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ENV_FILE = REPO_ROOT / ".env.production"
 
 RELEASE_WORKFLOW_FILES = (
-    Path(".github/workflows/build-browseros.yml"),
-    Path(".github/workflows/release-browseros.yml"),
+    Path(".github/workflows/build-slavebrowser.yml"),
+    Path(".github/workflows/release-slavebrowser.yml"),
     Path(".github/workflows/release-browserclaw.yml"),
     Path(".github/workflows/release-windows.yml"),
     Path(".github/workflows/release-extension-feeds.yml"),
@@ -70,8 +70,8 @@ ALLOWLIST: tuple[SecretSpec, ...] = (
     SecretSpec(
         "R2_ACCOUNT_ID",
         (
-            "build-browseros.yml",
-            "release-browseros.yml",
+            "build-slavebrowser.yml",
+            "release-slavebrowser.yml",
             "release-browserclaw.yml",
             "release-server.yml",
             "release-claw-onboard.yml",
@@ -84,8 +84,8 @@ ALLOWLIST: tuple[SecretSpec, ...] = (
     SecretSpec(
         "R2_ACCESS_KEY_ID",
         (
-            "build-browseros.yml",
-            "release-browseros.yml",
+            "build-slavebrowser.yml",
+            "release-slavebrowser.yml",
             "release-browserclaw.yml",
             "release-server.yml",
             "release-claw-onboard.yml",
@@ -98,8 +98,8 @@ ALLOWLIST: tuple[SecretSpec, ...] = (
     SecretSpec(
         "R2_SECRET_ACCESS_KEY",
         (
-            "build-browseros.yml",
-            "release-browseros.yml",
+            "build-slavebrowser.yml",
+            "release-slavebrowser.yml",
             "release-browserclaw.yml",
             "release-server.yml",
             "release-claw-onboard.yml",
@@ -112,8 +112,8 @@ ALLOWLIST: tuple[SecretSpec, ...] = (
     SecretSpec(
         "R2_BUCKET",
         (
-            "build-browseros.yml",
-            "release-browseros.yml",
+            "build-slavebrowser.yml",
+            "release-slavebrowser.yml",
             "release-browserclaw.yml",
             "release-server.yml",
             "release-claw-onboard.yml",
@@ -124,22 +124,22 @@ ALLOWLIST: tuple[SecretSpec, ...] = (
         ),
     ),  # Release artifact downloads/uploads.
     SecretSpec(
-        "BROWSEROS_CONFIG_URL",
-        ("release-browseros.yml", "release-server.yml"),
-    ),  # BrowserOS server inline production config URL.
+        "SLAVEAGENT_CONFIG_URL",
+        ("release-slavebrowser.yml", "release-server.yml"),
+    ),  # SlaveBrowser server inline production config URL.
     SecretSpec(
         "POSTHOG_API_KEY",
-        ("release-browseros.yml", "release-server.yml", "release-extensions.yml"),
+        ("release-slavebrowser.yml", "release-server.yml", "release-extensions.yml"),
     ),  # Server and extension release analytics key.
     SecretSpec(
         "SENTRY_DSN",
-        ("release-browseros.yml", "release-server.yml"),
-    ),  # BrowserOS server inline Sentry DSN.
+        ("release-slavebrowser.yml", "release-server.yml"),
+    ),  # SlaveBrowser server inline Sentry DSN.
     SecretSpec(
         "ESIGNER_USERNAME",
         (
-            "build-browseros.yml",
-            "release-browseros.yml",
+            "build-slavebrowser.yml",
+            "release-slavebrowser.yml",
             "release-browserclaw.yml",
             "release-windows.yml",
             "publish-server-ota.yml",
@@ -148,8 +148,8 @@ ALLOWLIST: tuple[SecretSpec, ...] = (
     SecretSpec(
         "ESIGNER_PASSWORD",
         (
-            "build-browseros.yml",
-            "release-browseros.yml",
+            "build-slavebrowser.yml",
+            "release-slavebrowser.yml",
             "release-browserclaw.yml",
             "release-windows.yml",
             "publish-server-ota.yml",
@@ -158,8 +158,8 @@ ALLOWLIST: tuple[SecretSpec, ...] = (
     SecretSpec(
         "ESIGNER_TOTP_SECRET",
         (
-            "build-browseros.yml",
-            "release-browseros.yml",
+            "build-slavebrowser.yml",
+            "release-slavebrowser.yml",
             "release-browserclaw.yml",
             "release-windows.yml",
             "publish-server-ota.yml",
@@ -167,13 +167,13 @@ ALLOWLIST: tuple[SecretSpec, ...] = (
     ),  # Windows signing preflight and CodeSignTool auth.
     SecretSpec(
         "ESIGNER_CREDENTIAL_ID",
-        ("build-browseros.yml", "publish-server-ota.yml"),
+        ("build-slavebrowser.yml", "publish-server-ota.yml"),
     ),  # Optional SSL.com credential selector used by the builder.
     SecretSpec(
         "SPARKLE_PRIVATE_KEY",
         (
-            "build-browseros.yml",
-            "release-browseros.yml",
+            "build-slavebrowser.yml",
+            "release-slavebrowser.yml",
             "release-browserclaw.yml",
             "release-windows.yml",
             "release-server.yml",
@@ -183,28 +183,28 @@ ALLOWLIST: tuple[SecretSpec, ...] = (
     ),  # Sparkle/WinSparkle artifact signatures and optional server OTA.
     SecretSpec(
         "MACOS_CERTIFICATE_NAME",
-        ("build-browseros.yml", "publish-server-ota.yml"),
+        ("build-slavebrowser.yml", "publish-server-ota.yml"),
     ),  # macOS signing certificate identity.
     SecretSpec(
         "PROD_MACOS_NOTARIZATION_APPLE_ID",
-        ("build-browseros.yml", "publish-server-ota.yml"),
+        ("build-slavebrowser.yml", "publish-server-ota.yml"),
     ),  # macOS notarization account.
     SecretSpec(
         "PROD_MACOS_NOTARIZATION_TEAM_ID",
-        ("build-browseros.yml", "publish-server-ota.yml"),
+        ("build-slavebrowser.yml", "publish-server-ota.yml"),
     ),  # macOS notarization team.
     SecretSpec(
         "PROD_MACOS_NOTARIZATION_PWD",
-        ("build-browseros.yml", "publish-server-ota.yml"),
+        ("build-slavebrowser.yml", "publish-server-ota.yml"),
     ),  # macOS notarization app-specific password.
     SecretSpec(
-        "BROWSEROS_AGENT_V2_KEY",
-        ("release-browseros.yml", "release-extensions.yml"),
-    ),  # BrowserOS agent extension signing key.
+        "SLAVEAGENT_AGENT_V2_KEY",
+        ("release-slavebrowser.yml", "release-extensions.yml"),
+    ),  # SlaveBrowser agent extension signing key.
     SecretSpec(
-        "BROWSEROS_CONTROLLER_KEY",
+        "SLAVEAGENT_CONTROLLER_KEY",
         ("release-extensions.yml",),
-    ),  # BrowserOS controller extension signing key.
+    ),  # SlaveBrowser controller extension signing key.
     SecretSpec(
         "BUGREPORTER_KEY",
         ("release-extensions.yml",),
@@ -240,14 +240,14 @@ ALLOWLIST: tuple[SecretSpec, ...] = (
     SecretSpec(
         "VITE_CLAW_POSTHOG_KEY",
         (
-            "build-browseros.yml",
+            "build-slavebrowser.yml",
             "release-browserclaw.yml",
             "release-extensions.yml",
         ),
     ),  # Required BrowserClaw build-time analytics key.
     SecretSpec(
         "VITE_CLAW_POSTHOG_HOST",
-        ("build-browseros.yml", "release-extensions.yml"),
+        ("build-slavebrowser.yml", "release-extensions.yml"),
     ),  # Optional BrowserClaw build-time analytics host.
 )
 
