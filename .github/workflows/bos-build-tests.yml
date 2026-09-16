@@ -5,23 +5,23 @@ on:
     branches:
       - main
     paths:
-      - "packages/browseros/bos_build/**"
-      - "packages/browseros/tools/vendor_uploads/**"
-      - "packages/browseros/chromium_files/products/**"
-      - "packages/browseros/pyproject.toml"
-      - "packages/browseros/uv.lock"
+      - "packages/slave agent/bos_build/**"
+      - "packages/slave agent/tools/vendor_uploads/**"
+      - "packages/slave agent/slavebrowser_files/products/**"
+      - "packages/slave agent/pyproject.toml"
+      - "packages/slave agent/uv.lock"
       - "tools/release_secrets/**"
-      - ".github/scripts/macos-chromium-workspace.sh"
+      - ".github/scripts/macos-slave browser-workspace.sh"
       - ".github/scripts/macos-signing-keychain.sh"
       - ".github/workflows/bos-build-tests.yml"
-      - ".github/workflows/build-browseros.yml"
-      - ".github/workflows/nightly-macos-browseros.yml"
+      - ".github/workflows/build-slave agent.yml"
+      - ".github/workflows/nightly-macos-slave agent.yml"
       - ".github/workflows/nightly-macos-browserclaw.yml"
       - ".github/workflows/reusable-build-macos-nightly.yml"
       - ".github/workflows/publish-server-ota.yml"
       - ".github/workflows/repair-update-feed.yml"
       - ".github/workflows/release-app-onboard.yml"
-      - ".github/workflows/release-browseros.yml"
+      - ".github/workflows/release-slave agent.yml"
       - ".github/workflows/release-browserclaw.yml"
       - ".github/workflows/release-claw-onboard.yml"
       - ".github/workflows/release-claw-server.yml"
@@ -40,7 +40,7 @@ jobs:
       contents: read
     defaults:
       run:
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -60,14 +60,14 @@ jobs:
 
       - name: CLI smoke
         run: |
-          uv run browseros build --list > /dev/null
-          # Runner has no chromium checkout — this smoke IS the
+          uv run slave agent build --list > /dev/null
+          # Runner has no slave browser checkout — this smoke IS the
           # no-checkout regression test for --show-plan.
-          uv run browseros build --preset release --show-plan
-          uv run browseros product doctor
+          uv run slave agent build --preset release --show-plan
+          uv run slave agent product doctor
 
       - name: Run vendor_uploads tests
-        working-directory: packages/browseros/tools/vendor_uploads
+        working-directory: packages/slave agent/tools/vendor_uploads
         run: uv run python -m unittest discover -s vendor_uploads -t . -p "*_test.py"
 
   windows-git-bootstrap:
@@ -84,5 +84,5 @@ jobs:
 
       - name: Verify Windows Git bootstrap
         shell: bash
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         run: uv run python -m unittest bos_build.ci_workflow_test -v

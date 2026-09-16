@@ -1,4 +1,4 @@
-name: "Release: BrowserOS neo Onboarding"
+name: "Release: Slave Agent neo Onboarding"
 
 on:
   push:
@@ -112,7 +112,7 @@ jobs:
 
       - name: Resolve release
         id: release
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
           EVENT_NAME: ${{ github.event_name }}
@@ -125,7 +125,7 @@ jobs:
           REQUESTED_VERSION: ${{ inputs.version || '' }}
         run: |
           set -euo pipefail
-          uv run browseros release component resolve \
+          uv run slave agent release component resolve \
             --component claw-onboard \
             --event-name "$EVENT_NAME" \
             --default-branch "$DEFAULT_BRANCH" \
@@ -163,14 +163,14 @@ jobs:
           changelog="/tmp/release-changelog.md"
           notes="/tmp/release-notes.md"
           if [ -z "$PREVIOUS_TAG" ]; then
-            echo "Initial BrowserOS neo Onboarding release." > "$changelog"
+            echo "Initial Slave Agent neo Onboarding release." > "$changelog"
           else
             git log "$PREVIOUS_TAG..$RELEASE_SHA" --pretty=format:"- %s (%h)" > "$changelog"
             if [ ! -s "$changelog" ]; then
               echo "No commits since $PREVIOUS_TAG." > "$changelog"
             fi
           fi
-          node packages/browseros-agent/scripts/release/cap-release-changelog.mjs \
+          node packages/slave agent-agent/scripts/release/cap-release-changelog.mjs \
             --input "$changelog" \
             --output "$notes" \
             --max-entries 15 \
@@ -185,7 +185,7 @@ jobs:
           VERSION: ${{ steps.release.outputs.version }}
         run: |
           set -euo pipefail
-          title="BrowserOS neo Onboarding - v$VERSION"
+          title="Slave Agent neo Onboarding - v$VERSION"
           release_sha="${{ steps.release.outputs.release_sha }}"
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             release="$(gh release view "$RELEASE_TAG" --json isDraft,targetCommitish,assets)"
@@ -226,30 +226,30 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version-file: packages/browseros-agent/package.json
+          bun-version-file: packages/slave agent-agent/package.json
 
-      - name: Install browseros-agent dependencies
-        working-directory: packages/browseros-agent
+      - name: Install slave agent-agent dependencies
+        working-directory: packages/slave agent-agent
         run: bun ci
 
       - name: Stamp onboarding artifact version
-        working-directory: packages/browseros
-        run: uv run browseros release component stamp --component claw-onboard --version "$VERSION"
+        working-directory: packages/slave agent
+        run: uv run slave agent release component stamp --component claw-onboard --version "$VERSION"
 
       - name: Publish onboarding resources to R2
-        working-directory: packages/browseros-agent
+        working-directory: packages/slave agent-agent
         run: bun scripts/build/claw-onboard.ts --upload --versioned-only
 
       - name: Attach onboarding zip to GitHub release
-        working-directory: packages/browseros-agent
+        working-directory: packages/slave agent-agent
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          asset="dist/prod/claw-onboard/browseros-claw-onboard-resources.zip"
+          asset="dist/prod/claw-onboard/slave agent-claw-onboard-resources.zip"
           test -f "$asset"
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --verify-tag --draft --generate-notes --title "BrowserOS neo Onboarding - v$VERSION"
+            gh release create "$RELEASE_TAG" --verify-tag --draft --generate-notes --title "Slave Agent neo Onboarding - v$VERSION"
           fi
           gh release upload "$RELEASE_TAG" "$asset" --clobber
 
@@ -289,7 +289,7 @@ jobs:
         run: |
           set -euo pipefail
           release="$(gh release view "$RELEASE_TAG" --json isDraft,targetCommitish,assets)"
-          asset_count="$(jq '[.assets[] | select(.name == "browseros-claw-onboard-resources.zip")] | length' <<< "$release")"
+          asset_count="$(jq '[.assets[] | select(.name == "slave agent-claw-onboard-resources.zip")] | length' <<< "$release")"
           if [ "$asset_count" -ne 1 ]; then
             echo "::error::Expected onboarding draft asset, found $asset_count"
             exit 1
@@ -302,7 +302,7 @@ jobs:
               exit 1
             fi
           fi
-          name="browseros-claw-onboard-resources.zip"
+          name="slave agent-claw-onboard-resources.zip"
           key="claw-onboard/prod-resources/${VERSION}/${name}"
           metadata="$(aws s3api head-object --endpoint-url "$R2_ENDPOINT" --region auto --bucket "$R2_BUCKET" --key "$key" --query Metadata --output json)"
           if ! jq -e \
@@ -342,7 +342,7 @@ jobs:
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git tag -a "$RELEASE_TAG" -m "BrowserOS neo Onboarding - v$VERSION" "$RELEASE_SHA"
+            git tag -a "$RELEASE_TAG" -m "Slave Agent neo Onboarding - v$VERSION" "$RELEASE_SHA"
             git push origin "refs/tags/$RELEASE_TAG"
           fi
 
@@ -360,7 +360,7 @@ jobs:
           R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
         run: |
           set -euo pipefail
-          name="browseros-claw-onboard-resources.zip"
+          name="slave agent-claw-onboard-resources.zip"
           source="claw-onboard/prod-resources/${VERSION}/${name}"
           destination="claw-onboard/prod-resources/latest/${name}"
           aws s3api copy-object --endpoint-url "$R2_ENDPOINT" --region auto --bucket "$R2_BUCKET" --copy-source "$R2_BUCKET/$source" --metadata-directive COPY --key "$destination" >/dev/null
@@ -379,12 +379,12 @@ jobs:
       - name: Summarize onboarding resource keys
         run: |
           {
-            echo "### BrowserOS neo Onboarding resource publish"
+            echo "### Slave Agent neo Onboarding resource publish"
             echo
             echo "- Version: \`$VERSION\`"
             echo "- GitHub release: \`$RELEASE_TAG\`"
-            echo "- Latest: \`claw-onboard/prod-resources/latest/browseros-claw-onboard-resources.zip\`"
-            echo "- Versioned: \`claw-onboard/prod-resources/${VERSION}/browseros-claw-onboard-resources.zip\`"
+            echo "- Latest: \`claw-onboard/prod-resources/latest/slave agent-claw-onboard-resources.zip\`"
+            echo "- Versioned: \`claw-onboard/prod-resources/${VERSION}/slave agent-claw-onboard-resources.zip\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
   reflect-version:
@@ -413,13 +413,13 @@ jobs:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           set -euo pipefail
-          package_json="packages/browseros-agent/apps/claw-onboard/package.json"
-          lock="packages/browseros-agent/bun.lock"
+          package_json="packages/slave agent-agent/apps/claw-onboard/package.json"
+          lock="packages/slave agent-agent/bun.lock"
           branch="chore-bump-claw-onboard-v${VERSION}"
 
           git fetch origin "$DEFAULT_BRANCH" --no-tags
           git checkout -B "$DEFAULT_BRANCH" "origin/$DEFAULT_BRANCH"
-          uv run --directory packages/browseros browseros release component stamp \
+          uv run --directory packages/slave agent slave agent release component stamp \
             --component claw-onboard \
             --version "$VERSION"
 
@@ -438,7 +438,7 @@ jobs:
                 --head "$branch")"
             fi
             head_sha="$(gh pr view "$pr_url" --json headRefOid --jq '.headRefOid')"
-            packages/browseros-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"
+            packages/slave agent-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"
             exit 0
           fi
 
@@ -454,4 +454,4 @@ jobs:
             --body "Reflects the published claw-onboard/v${VERSION} onboarding resources." \
             --base "$DEFAULT_BRANCH" \
             --head "$branch")"
-          packages/browseros-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"
+          packages/slave agent-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"

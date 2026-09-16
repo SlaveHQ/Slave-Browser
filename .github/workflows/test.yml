@@ -2,7 +2,7 @@ name: Tests
 
 # A discover job computes which suites a change touches (via Turbo) and runs
 # only those, so unaffected suites are never spun up. Suites map from affected
-# packages in packages/browseros-agent/ci/affected-suites.ts; a gate job rolls
+# packages in packages/slave agent-agent/ci/affected-suites.ts; a gate job rolls
 # up pass/skip and the summary job posts the sticky per-suite table.
 on:
   pull_request:
@@ -13,19 +13,19 @@ on:
       - ready_for_review
     paths:
       - .github/workflows/test.yml
-      - .github/workflows/build-browseros.yml
+      - .github/workflows/build-slave agent.yml
       - .github/workflows/nightly*.yml
       - .github/workflows/reusable-build-macos-nightly.yml
       - .github/workflows/publish-server-ota.yml
       - .github/workflows/release-*.yml
-      - packages/browseros-agent/**
+      - packages/slave agent-agent/**
   workflow_dispatch:
 
 permissions:
   contents: read
 
 env:
-  BROWSEROS_APPIMAGE_URL: https://files.browseros.com/download/BrowserOS.AppImage
+  SLAVEAGENT_APPIMAGE_URL: https://files.slave agent.com/download/Slave Agent.AppImage
 
 concurrency:
   group: tests-${{ github.event.pull_request.number || github.ref }}
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: packages/browseros-agent
+        working-directory: packages/slave agent-agent
     outputs:
       matrix: ${{ steps.affected.outputs.matrix }}
       has_any: ${{ steps.affected.outputs.has_any }}
@@ -53,7 +53,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version-file: packages/browseros-agent/package.json
+          bun-version-file: packages/slave agent-agent/package.json
 
       - name: Install dependencies
         run: bun ci
@@ -61,7 +61,7 @@ jobs:
       - name: Compute affected suites
         id: affected
         env:
-          BROWSEROS_AFFECTED_BASE: ${{ github.event.pull_request.base.sha }}
+          SLAVEAGENT_AFFECTED_BASE: ${{ github.event.pull_request.base.sha }}
           TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
         run: bun run ci/affected-suites.ts
 
@@ -73,7 +73,7 @@ jobs:
     timeout-minutes: ${{ matrix.needs_rust && 45 || 20 }}
     defaults:
       run:
-        working-directory: packages/browseros-agent
+        working-directory: packages/slave agent-agent
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
@@ -85,7 +85,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version-file: packages/browseros-agent/package.json
+          bun-version-file: packages/slave agent-agent/package.json
 
       - name: Setup Rust
         if: matrix.needs_rust == true
@@ -99,10 +99,10 @@ jobs:
         if: matrix.needs_rust == true
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: packages/browseros-agent
+          workspaces: packages/slave agent-agent
           # Without this the key embeds GITHUB_JOB, so the warm cache produced
           # on main by a differently named job could never be restored here.
-          shared-key: browseros-agent
+          shared-key: slave agent-agent
           # rust-cache hashes every toolchain `rustup toolchain list` reports,
           # not just the pinned one, and the runner image ships its own Rust
           # alongside it. That set changes as images roll out, so the key
@@ -115,69 +115,69 @@ jobs:
           # share them, and rust-cache only saves workspace target dirs plus the
           # registry and git caches by default. Name the build dir explicitly or
           # every run would recompile the dependency graph from scratch.
-          cache-directories: ~/.cargo/build/browseros
+          cache-directories: ~/.cargo/build/slave agent
 
       - name: Install dependencies
         run: bun ci
 
-      - name: Resolve BrowserOS cache key
+      - name: Resolve Slave Agent cache key
         if: matrix.needs_browser == true
-        id: browseros-cache-key
+        id: slave agent-cache-key
         run: |
           set -euo pipefail
-          headers="$(curl -fsSI "$BROWSEROS_APPIMAGE_URL")"
+          headers="$(curl -fsSI "$SLAVEAGENT_APPIMAGE_URL")"
           etag="$(printf '%s\n' "$headers" | awk 'BEGIN{IGNORECASE=1} /^etag:/ {sub(/\r$/, "", $2); gsub(/"/, "", $2); print $2; exit}')"
           last_modified="$(printf '%s\n' "$headers" | awk 'BEGIN{IGNORECASE=1} /^last-modified:/ {$1=""; sub(/^ /, ""); sub(/\r$/, ""); print; exit}')"
           raw_key="${etag:-$last_modified}"
           if [ -z "$raw_key" ]; then
-            raw_key="$BROWSEROS_APPIMAGE_URL"
+            raw_key="$SLAVEAGENT_APPIMAGE_URL"
           fi
           cache_key="$(printf '%s' "$raw_key" | shasum -a 256 | awk '{print $1}')"
-          echo "key=browseros-appimage-${{ runner.os }}-$cache_key" >> "$GITHUB_OUTPUT"
+          echo "key=slave agent-appimage-${{ runner.os }}-$cache_key" >> "$GITHUB_OUTPUT"
 
-      - name: Restore BrowserOS cache
+      - name: Restore Slave Agent cache
         if: matrix.needs_browser == true
-        id: browseros-cache
+        id: slave agent-cache
         uses: actions/cache@v6.1.0
         with:
-          path: packages/browseros-agent/.ci/bin/BrowserOS.AppImage
-          key: ${{ steps.browseros-cache-key.outputs.key }}
+          path: packages/slave agent-agent/.ci/bin/Slave Agent.AppImage
+          key: ${{ steps.slave agent-cache-key.outputs.key }}
 
-      - name: Download BrowserOS
-        if: matrix.needs_browser == true && steps.browseros-cache.outputs.cache-hit != 'true'
+      - name: Download Slave Agent
+        if: matrix.needs_browser == true && steps.slave agent-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p .ci/bin
-          curl -fsSL "$BROWSEROS_APPIMAGE_URL" -o .ci/bin/BrowserOS.AppImage
-          chmod +x .ci/bin/BrowserOS.AppImage
+          curl -fsSL "$SLAVEAGENT_APPIMAGE_URL" -o .ci/bin/Slave Agent.AppImage
+          chmod +x .ci/bin/Slave Agent.AppImage
 
-      - name: Prepare BrowserOS wrapper
+      - name: Prepare Slave Agent wrapper
         if: matrix.needs_browser == true
         run: |
           mkdir -p .ci/bin
-          cat > .ci/bin/browseros <<'EOF'
+          cat > .ci/bin/slave agent <<'EOF'
           #!/usr/bin/env bash
           set -euo pipefail
           export APPIMAGE_EXTRACT_AND_RUN=1
-          # Chromium's hidden-window APIs require a real X11 platform.
-          if [ "${BROWSEROS_TEST_HEADLESS:-true}" = "false" ]; then
+          # Slave Browser's hidden-window APIs require a real X11 platform.
+          if [ "${SLAVEAGENT_TEST_HEADLESS:-true}" = "false" ]; then
             export XDG_SESSION_TYPE=x11
-            exec xvfb-run --auto-servernum "$(dirname "$0")/BrowserOS.AppImage" "$@"
+            exec xvfb-run --auto-servernum "$(dirname "$0")/Slave Agent.AppImage" "$@"
           fi
-          exec "$(dirname "$0")/BrowserOS.AppImage" "$@"
+          exec "$(dirname "$0")/Slave Agent.AppImage" "$@"
           EOF
-          chmod +x .ci/bin/browseros
+          chmod +x .ci/bin/slave agent
 
       - name: Create dev env file
-        working-directory: packages/browseros-agent
+        working-directory: packages/slave agent-agent
         run: cp .env.development.example .env.development
 
       - name: Run ${{ matrix.suite }} tests
         id: test
         env:
-          BROWSEROS_BINARY: ${{ github.workspace }}/packages/browseros-agent/.ci/bin/browseros
-          BROWSEROS_TEST_HEADLESS: ${{ matrix.suite == 'claw-mcp' && 'false' || 'true' }}
-          BROWSEROS_TEST_EXTRA_ARGS: --no-sandbox --disable-dev-shm-usage
-          BROWSEROS_JUNIT_PATH: ${{ github.workspace }}/packages/browseros-agent/${{ matrix.junit_path }}
+          SLAVEAGENT_BINARY: ${{ github.workspace }}/packages/slave agent-agent/.ci/bin/slave agent
+          SLAVEAGENT_TEST_HEADLESS: ${{ matrix.suite == 'claw-mcp' && 'false' || 'true' }}
+          SLAVEAGENT_TEST_EXTRA_ARGS: --no-sandbox --disable-dev-shm-usage
+          SLAVEAGENT_JUNIT_PATH: ${{ github.workspace }}/packages/slave agent-agent/${{ matrix.junit_path }}
         run: |
           set +e
           mkdir -p test-results
@@ -230,7 +230,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: junit-${{ matrix.suite }}
-          path: packages/browseros-agent/${{ matrix.junit_path }}
+          path: packages/slave agent-agent/${{ matrix.junit_path }}
 
       - name: Summarize suite result
         if: always()
@@ -284,7 +284,7 @@ jobs:
           import glob, json, os, xml.etree.ElementTree as ET
 
           run_url = f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
-          marker = "<!-- browseros-agent-tests-summary -->"
+          marker = "<!-- slave agent-agent-tests-summary -->"
           all_suites = json.loads(os.environ.get("ALL_SUITES") or "[]")
 
           ran = {}
@@ -367,7 +367,7 @@ jobs:
           script: |
             const fs = require('fs');
             const body = fs.readFileSync('comment.md', 'utf8');
-            const marker = '<!-- browseros-agent-tests-summary -->';
+            const marker = '<!-- slave agent-agent-tests-summary -->';
             const { owner, repo } = context.repo;
             const issue_number = context.payload.pull_request.number;
 

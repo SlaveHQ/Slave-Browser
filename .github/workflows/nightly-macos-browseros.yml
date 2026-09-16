@@ -1,4 +1,4 @@
-name: "Nightly: BrowserOS (macOS arm64)"
+name: "Nightly: Slave Agent (macOS arm64)"
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   transaction:
-    name: Freeze and reserve BrowserOS transaction
+    name: Freeze and reserve Slave Agent transaction
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -44,7 +44,7 @@ jobs:
 
       - name: Reconcile product transaction
         id: transaction
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           GH_TOKEN: ${{ github.token }}
@@ -61,9 +61,9 @@ jobs:
           fi
           source_sha="$(git rev-parse HEAD)"
           test "$source_sha" = "$GITHUB_SHA"
-          uv run browseros release suite reconcile \
+          uv run slave agent release suite reconcile \
             --mode nightly \
-            --product browseros \
+            --product slave agent \
             --source-sha "$source_sha" \
             --default-branch "$DEFAULT_BRANCH" \
             --dispatch-ref "$DEFAULT_BRANCH" \
@@ -75,7 +75,7 @@ jobs:
           fi
 
   prepare-server:
-    name: Prepare exact BrowserOS server
+    name: Prepare exact Slave Agent server
     needs: transaction
     uses: ./.github/workflows/release-server.yml
     permissions:
@@ -108,7 +108,7 @@ jobs:
     secrets: inherit
 
   verify-components:
-    name: Verify exact prepared BrowserOS components
+    name: Verify exact prepared Slave Agent components
     needs: [transaction, prepare-server, prepare-agent]
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -127,14 +127,14 @@ jobs:
           test "$SERVER_VERSION" = "${{ needs.transaction.outputs.server_version }}"
           test "$EXTENSION_VERSION" = "${{ needs.transaction.outputs.agent_version }}"
 
-  build-browseros:
-    name: Build signed BrowserOS nightly
+  build-slave agent:
+    name: Build signed Slave Agent nightly
     needs: [transaction, verify-components]
     uses: ./.github/workflows/reusable-build-macos-nightly.yml
     permissions:
       contents: read
     with:
-      product: browseros
+      product: slave agent
       state_ref: ${{ needs.transaction.outputs.state_ref }}
       source_sha: ${{ needs.transaction.outputs.source_sha }}
       reservation_sha: ${{ needs.transaction.outputs.reservation_sha }}
@@ -145,8 +145,8 @@ jobs:
     secrets: inherit
 
   finalize-server:
-    name: Finalize exact BrowserOS server
-    needs: [transaction, build-browseros]
+    name: Finalize exact Slave Agent server
+    needs: [transaction, build-slave agent]
     uses: ./.github/workflows/release-server.yml
     permissions:
       contents: write
@@ -161,7 +161,7 @@ jobs:
 
   finalize-agent:
     name: Finalize exact agent extension
-    needs: [transaction, build-browseros]
+    needs: [transaction, build-slave agent]
     uses: ./.github/workflows/release-extensions.yml
     permissions:
       contents: write
@@ -176,14 +176,14 @@ jobs:
     secrets: inherit
 
   server-ota:
-    name: Assemble BrowserOS server alpha snapshot
+    name: Assemble Slave Agent server alpha snapshot
     needs: [transaction, finalize-server]
     uses: ./.github/workflows/publish-server-ota.yml
     permissions:
       contents: write
       pull-requests: write
     with:
-      product: browseros
+      product: slave agent
       version: ${{ needs.transaction.outputs.server_version }}
       release_sha: ${{ needs.transaction.outputs.source_sha }}
       snapshot_path: updates/server/appcast-server.alpha.xml
@@ -191,8 +191,8 @@ jobs:
     secrets: inherit
 
   publish:
-    name: Merge and publish BrowserOS nightly
-    needs: [transaction, build-browseros, finalize-server, finalize-agent, server-ota]
+    name: Merge and publish Slave Agent nightly
+    needs: [transaction, build-slave agent, finalize-server, finalize-agent, server-ota]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
@@ -218,13 +218,13 @@ jobs:
 
       - name: Recover product transaction
         id: recovery
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         run: |
           set -euo pipefail
           record="$RUNNER_TEMP/release-suite.json"
-          uv run browseros release suite inspect \
+          uv run slave agent release suite inspect \
             --mode nightly \
-            --product browseros \
+            --product slave agent \
             --source-sha "$SOURCE_SHA" \
             --default-branch "$DEFAULT_BRANCH" \
             --dispatch-ref "$DEFAULT_BRANCH" \
@@ -237,14 +237,14 @@ jobs:
 
       - uses: actions/download-artifact@v7
         with:
-          name: ${{ needs.build-browseros.outputs.artifact_name }}
-          path: ${{ runner.temp }}/nightly-browseros
+          name: ${{ needs.build-slave agent.outputs.artifact_name }}
+          path: ${{ runner.temp }}/nightly-slave agent
 
       - uses: actions/download-artifact@v7
         if: steps.recovery.outputs.state == 'open'
         with:
-          name: server-ota-snapshot-browseros
-          path: ${{ runner.temp }}/server-ota-browseros
+          name: server-ota-snapshot-slave agent
+          path: ${{ runner.temp }}/server-ota-slave agent
 
       - name: Compose snapshots from current main
         id: baseline
@@ -262,14 +262,14 @@ jobs:
             updates/extensions/extensions.alpha.json \
             updates/extensions/update-manifest.alpha.xml \
             updates/server/appcast-server.alpha.xml
-          snapshot="$(find "$RUNNER_TEMP/server-ota-browseros" -type f -name 'appcast-server.alpha.xml' -print -quit)"
+          snapshot="$(find "$RUNNER_TEMP/server-ota-slave agent" -type f -name 'appcast-server.alpha.xml' -print -quit)"
           test -n "$snapshot"
           cp "$snapshot" updates/server/appcast-server.alpha.xml
           echo "sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Render shared extension feeds with the selected product pin
         if: steps.recovery.outputs.state == 'open'
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           EXTENSION_VERSION: ${{ needs.transaction.outputs.agent_version }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -278,23 +278,23 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          uv run browseros release extensions \
+          uv run slave agent release extensions \
             --channel alpha \
             --baseline-root "$GITHUB_WORKSPACE/updates" \
             --set "agent=$EXTENSION_VERSION"
 
       - name: Reconcile and merge product state
         if: steps.recovery.outputs.state == 'open'
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           BASE_SHA: ${{ steps.baseline.outputs.sha }}
         run: |
           set -euo pipefail
           record="$RUNNER_TEMP/release-suite.json"
           gate="$RUNNER_TEMP/release-suite-gate.json"
-          uv run browseros release suite reconcile \
+          uv run slave agent release suite reconcile \
             --mode nightly \
-            --product browseros \
+            --product slave agent \
             --source-sha "$SOURCE_SHA" \
             --default-branch "$DEFAULT_BRANCH" \
             --dispatch-ref "$DEFAULT_BRANCH" \
@@ -303,7 +303,7 @@ jobs:
             --state-root "$GITHUB_WORKSPACE" \
             --output "$record"
           jq '{
-            schema: "browseros-release-suite-gate-v1",
+            schema: "slave agent-release-suite-gate-v1",
             passed: true,
             transaction_id,
             source_sha,
@@ -311,24 +311,24 @@ jobs:
             browser_version,
             component_versions,
             state_checksums,
-            products: ["browseros"]
+            products: ["slave agent"]
           }' "$record" > "$gate"
-          uv run browseros release suite merge \
+          uv run slave agent release suite merge \
             --record "$record" \
             --gate "$gate" \
             --repo "$GITHUB_REPOSITORY"
 
       - name: Verify merged transaction and restore current committed feeds
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         run: |
           set -euo pipefail
           record="$RUNNER_TEMP/release-suite.json"
           test "$(jq -r '.state' "$record")" = "merged"
           merge_sha="$(jq -r '.merge_sha' "$record")"
           [[ "$merge_sha" =~ ^[0-9a-fA-F]{40}$ ]]
-          uv run browseros release suite inspect \
+          uv run slave agent release suite inspect \
             --mode nightly \
-            --product browseros \
+            --product slave agent \
             --source-sha "$SOURCE_SHA" \
             --default-branch "$DEFAULT_BRANCH" \
             --dispatch-ref "$DEFAULT_BRANCH" \
@@ -349,7 +349,7 @@ jobs:
             updates/server/appcast-server.alpha.xml
 
       - name: Publish immutable signed browser artifact
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -357,13 +357,13 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          uv run browseros release suite publish-browser-artifact \
+          uv run slave agent release suite publish-browser-artifact \
             --record "$RUNNER_TEMP/release-suite.json" \
-            --product browseros \
-            --artifact-root "$RUNNER_TEMP/nightly-browseros"
+            --product slave agent \
+            --artifact-root "$RUNNER_TEMP/nightly-slave agent"
 
       - name: Publish current committed product feeds
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -371,7 +371,7 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          uv run browseros release feeds publish-local \
+          uv run slave agent release feeds publish-local \
             server/appcast-server.alpha.xml \
             extensions/update-manifest.alpha.xml \
             extensions/extensions.alpha.json \
@@ -379,30 +379,30 @@ jobs:
             --publish
 
       - name: Reconcile product rolling nightly release
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           VERSION: ${{ needs.transaction.outputs.browser_version }}
         run: |
           set -euo pipefail
           # Immutable bytes and committed feeds precede the retryable rolling
           # release saga. A newer product tag is preserved by its source checks.
-          uv run browseros release suite reconcile-rolling-release \
-            --tag nightly-browseros \
-            --title "BrowserOS Nightly (signed macOS arm64)" \
+          uv run slave agent release suite reconcile-rolling-release \
+            --tag nightly-slave agent \
+            --title "Slave Agent Nightly (signed macOS arm64)" \
             --source-sha "$SOURCE_SHA" \
             --browser-version "$VERSION" \
-            --artifact-root "$RUNNER_TEMP/nightly-browseros" \
+            --artifact-root "$RUNNER_TEMP/nightly-slave agent" \
             --repo "$GITHUB_REPOSITORY"
 
   notify-failure:
-    name: Notify BrowserOS nightly failure
+    name: Notify Slave Agent nightly failure
     if: ${{ always() && contains(needs.*.result, 'failure') }}
     needs:
       - transaction
       - prepare-server
       - prepare-agent
       - verify-components
-      - build-browseros
+      - build-slave agent
       - finalize-server
       - finalize-agent
       - server-ota
@@ -415,6 +415,6 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then exit 0; fi
-          payload="$(jq -cn --arg url "$RUN_URL" '{text: (":x: BrowserOS nightly failed — " + $url)}')"
+          payload="$(jq -cn --arg url "$RUN_URL" '{text: (":x: Slave Agent nightly failed — " + $url)}')"
           curl -fsS -X POST -H 'Content-type: application/json' \
             --data "$payload" "$SLACK_WEBHOOK_URL"

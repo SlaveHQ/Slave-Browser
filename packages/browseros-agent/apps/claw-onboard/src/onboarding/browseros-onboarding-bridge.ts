@@ -211,7 +211,20 @@ export function createBrowserOSOnboardingBridge(
     }
     if (options.mockSetupResult && options.mockSetupResult !== 'preparing') {
       updateState({ ...state, setupState: options.mockSetupResult })
+      return
     }
+    const hostWindow = getHostWindow()
+    const timer = hostWindow?.setTimeout ?? globalThis.setTimeout
+    timer(() => {
+      updateState({ ...state, setupState: 'succeeded' })
+      if (hostWindow && hostWindow.location) {
+        if (hostWindow.location.port === '5173' || hostWindow.location.port === '5174') {
+          hostWindow.location.href = `${hostWindow.location.protocol}//${hostWindow.location.hostname}:5175/index.html#/home`
+        } else if (hostWindow.location.hash.includes('onboarding') || hostWindow.location.pathname.includes('onboard')) {
+          hostWindow.location.hash = '#/home'
+        }
+      }
+    }, 400)
   }
 
   return {

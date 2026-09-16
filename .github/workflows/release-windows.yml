@@ -6,9 +6,9 @@ on:
       products:
         description: "Product set to build"
         type: choice
-        default: browseros
+        default: slave agent
         options:
-          - browseros
+          - slave agent
           - browserclaw
           - all
       upload_to_r2:
@@ -22,10 +22,10 @@ on:
   workflow_call:
     inputs:
       products:
-        description: "Product set to build: browseros, browserclaw, or all"
+        description: "Product set to build: slave agent, browserclaw, or all"
         required: false
         type: string
-        default: browseros
+        default: slave agent
       upload_to_r2:
         description: "Upload release metadata/artifacts to R2"
         required: false
@@ -80,7 +80,7 @@ on:
         required: false
       R2_BUCKET:
         required: false
-      BROWSEROS_CONFIG_URL:
+      SLAVEAGENT_CONFIG_URL:
         required: false
       POSTHOG_API_KEY:
         required: false
@@ -116,7 +116,7 @@ jobs:
       - name: Resolve product matrix
         id: plan
         env:
-          PRODUCTS: ${{ inputs.products || 'browseros' }}
+          PRODUCTS: ${{ inputs.products || 'slave agent' }}
           RESOURCE_MODE: ${{ inputs.resource_mode || 'published' }}
         run: |
           set -euo pipefail
@@ -126,13 +126,13 @@ jobs:
           fi
           case "$PRODUCTS" in
             all)
-              matrix='[{"product":"browseros"},{"product":"browserclaw"}]'
+              matrix='[{"product":"slave agent"},{"product":"browserclaw"}]'
               ;;
-            browseros|browserclaw)
+            slave agent|browserclaw)
               matrix="$(jq -cn --arg product "$PRODUCTS" '[{product:$product}]')"
               ;;
             *)
-              echo "::error::products must be one of: browseros, browserclaw, all"
+              echo "::error::products must be one of: slave agent, browserclaw, all"
               exit 1
               ;;
           esac
@@ -171,7 +171,7 @@ jobs:
   # (org runner-group policy, bad label, account issue) the build jobs sit
   # queued until GitHub discards them 24h later, holding the release-windows
   # concurrency group all day. Fail fast instead - see the troubleshooting
-  # section of packages/browseros/bos_build/docs/warpbuild-ci.md.
+  # section of packages/slave agent/bos_build/docs/warpbuild-ci.md.
   queue-watchdog:
     needs: [plan, preflight]
     runs-on: ubuntu-latest
@@ -183,7 +183,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CONCURRENCY_GROUP: release-windows
-          RUNNER_LABEL: warp-custom-browseros-windows-2025-x64-32x
+          RUNNER_LABEL: warp-custom-slave agent-windows-2025-x64-32x
           JOB_FILTER: >-
             [.jobs[]
             | select(any(.labels[]?; . == $runner_label))
@@ -213,7 +213,7 @@ jobs:
               exit 0
             fi
             if [ "$(date +%s)" -ge "$deadline" ]; then
-              doc="packages/browseros/bos_build/docs/warpbuild-ci.md"
+              doc="packages/slave agent/bos_build/docs/warpbuild-ci.md"
               if [ "$total" -eq 0 ]; then
                 echo "::error::queue-watchdog matched no build jobs - did the lane's runner label change? Fix the filter; not cancelling."
                 exit 1
@@ -239,12 +239,12 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.plan.outputs.matrix) }}
     name: build (${{ matrix.product }} windows-x64)
-    uses: ./.github/workflows/build-browseros.yml
+    uses: ./.github/workflows/build-slave agent.yml
     with:
       platform: windows
       arch: x64
       product: ${{ matrix.product }}
-      runner: warp-custom-browseros-windows-2025-x64-32x
+      runner: warp-custom-slave agent-windows-2025-x64-32x
       timeout-minutes: 780
       profile: release-ci
       sign: ${{ inputs.sign }}
@@ -261,7 +261,7 @@ jobs:
       R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
-      BROWSEROS_CONFIG_URL: ${{ secrets.BROWSEROS_CONFIG_URL }}
+      SLAVEAGENT_CONFIG_URL: ${{ secrets.SLAVEAGENT_CONFIG_URL }}
       POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       CLAW_POSTHOG_KEY: ${{ secrets.CLAW_POSTHOG_KEY }}

@@ -36,7 +36,7 @@ on:
         description: Actions artifact containing the signed DMG
         value: ${{ jobs.build.outputs.artifact_name }}
     secrets:
-      BROWSEROS_CONFIG_URL:
+      SLAVEAGENT_CONFIG_URL:
         required: true
       CLAW_POSTHOG_KEY:
         required: true
@@ -56,7 +56,7 @@ on:
         required: true
       PROD_MACOS_NOTARIZATION_TEAM_ID:
         required: true
-      PROD_MACOS_BROWSEROS_PASSKEY_PROFILE_B64:
+      PROD_MACOS_SLAVEAGENT_PASSKEY_PROFILE_B64:
         required: false
       PROD_MACOS_BROWSERCLAW_PASSKEY_PROFILE_B64:
         required: false
@@ -71,7 +71,7 @@ permissions:
 jobs:
   build:
     name: Build signed ${{ inputs.product }} nightly
-    runs-on: [self-hosted, macOS, ARM64, browseros-builder]
+    runs-on: [self-hosted, macOS, ARM64, slave agent-builder]
     concurrency:
       group: macos-build
       cancel-in-progress: false
@@ -80,8 +80,8 @@ jobs:
     outputs:
       artifact_name: ${{ steps.inputs.outputs.artifact_name }}
     env:
-      BROWSEROS_REPO: ${{ vars.BROWSEROS_REPO_PATH }}
-      CHROMIUM_SRC: ${{ vars.BROWSEROS_CHROMIUM_SRC }}
+      SLAVEAGENT_REPO: ${{ vars.SLAVEAGENT_REPO_PATH }}
+      SLAVEBROWSER_SRC: ${{ vars.SLAVEAGENT_SLAVEBROWSER_SRC }}
     steps:
       - name: Resolve and validate build inputs
         id: inputs
@@ -96,24 +96,24 @@ jobs:
           STATE_REF: ${{ inputs.state_ref }}
         run: |
           set -euo pipefail
-          repo="${BROWSEROS_REPO:-}"
-          chromium_src="${CHROMIUM_SRC:-}"
+          repo="${SLAVEAGENT_REPO:-}"
+          slavebrowser_src="${SLAVEBROWSER_SRC:-}"
           if [ -z "$repo" ] || [ ! -d "${repo/#\~/$HOME}/.git" ]; then
-            echo "::error::BROWSEROS_REPO_PATH must point to a Git checkout"
+            echo "::error::SLAVEAGENT_REPO_PATH must point to a Git checkout"
             exit 1
           fi
-          if [ -z "$chromium_src" ] || [ ! -d "${chromium_src/#\~/$HOME}" ]; then
-            echo "::error::BROWSEROS_CHROMIUM_SRC must point to Chromium"
+          if [ -z "$slavebrowser_src" ] || [ ! -d "${slavebrowser_src/#\~/$HOME}" ]; then
+            echo "::error::SLAVEAGENT_SLAVEBROWSER_SRC must point to Slave Browser"
             exit 1
           fi
           case "$PRODUCT" in
-            browseros)
-              artifact_name="BrowserOS_v${BROWSER_VERSION}_arm64"
-              artifact_glob="BrowserOS_*.dmg"
+            slave agent)
+              artifact_name="SlaveAgent_v${BROWSER_VERSION}_arm64"
+              artifact_glob="SlaveAgent_*.dmg"
               ;;
             browserclaw)
-              artifact_name="BrowserOS_neo_v${BROWSER_VERSION}_arm64"
-              artifact_glob="BrowserOS_neo_*.dmg"
+              artifact_name="SlaveAgent_neo_v${BROWSER_VERSION}_arm64"
+              artifact_glob="SlaveAgent_neo_*.dmg"
               ;;
             *)
               echo "::error::Unknown family product: $PRODUCT"
@@ -130,21 +130,21 @@ jobs:
             git check-ref-format --branch "$STATE_REF" >/dev/null
           fi
           {
-            echo "browseros_repo=${repo/#\~/$HOME}"
-            echo "chromium_src=${chromium_src/#\~/$HOME}"
+            echo "slaveagent_repo=${repo/#\~/$HOME}"
+            echo "slavebrowser_src=${slavebrowser_src/#\~/$HOME}"
             echo "artifact_name=$artifact_name"
             echo "artifact_glob=$artifact_glob"
           } >> "$GITHUB_OUTPUT"
 
       - name: Sync build repo to transaction reservation
         env:
-          BROWSEROS_REPO: ${{ steps.inputs.outputs.browseros_repo }}
+          SLAVEAGENT_REPO: ${{ steps.inputs.outputs.slaveagent_repo }}
           RESERVATION_SHA: ${{ inputs.reservation_sha }}
           SOURCE_SHA: ${{ inputs.source_sha }}
           STATE_REF: ${{ inputs.state_ref }}
         run: |
           set -euo pipefail
-          cd "$BROWSEROS_REPO"
+          cd "$SLAVEAGENT_REPO"
           if [[ "$STATE_REF" =~ ^refs/pull/[1-9][0-9]*/head$ ]]; then
             state_remote_ref="refs/remotes/origin/release-state"
             state_refspec="+$STATE_REF:$state_remote_ref"
@@ -169,42 +169,42 @@ jobs:
 
       - uses: astral-sh/setup-uv@v8.3.2
 
-      - name: Setup disposable Chromium workspace
-        id: chromium_workspace
-        working-directory: ${{ steps.inputs.outputs.browseros_repo }}
+      - name: Setup disposable Slave Browser workspace
+        id: slavebrowser_workspace
+        working-directory: ${{ steps.inputs.outputs.slaveagent_repo }}
         shell: bash
-        run: bash .github/scripts/macos-chromium-workspace.sh setup "${{ steps.inputs.outputs.chromium_src }}"
+        run: bash .github/scripts/macos-slave browser-workspace.sh setup "${{ steps.inputs.outputs.slavebrowser_src }}"
 
       - name: Verify shared browser version
         env:
-          BROWSEROS_REPO: ${{ steps.inputs.outputs.browseros_repo }}
+          SLAVEAGENT_REPO: ${{ steps.inputs.outputs.slaveagent_repo }}
           EXPECTED_VERSION: ${{ inputs.browser_version }}
         run: |
           set -euo pipefail
-          cd "$BROWSEROS_REPO/packages/browseros"
+          cd "$SLAVEAGENT_REPO/packages/slave agent"
           version="$(uv run python bos_build/scripts/bump_version.py --mode none)"
           test "$version" = "$EXPECTED_VERSION"
 
       - name: Remove stale nightly DMGs
         env:
-          BROWSEROS_REPO: ${{ steps.inputs.outputs.browseros_repo }}
+          SLAVEAGENT_REPO: ${{ steps.inputs.outputs.slaveagent_repo }}
           VERSION: ${{ inputs.browser_version }}
         run: |
           set -euo pipefail
-          release_dir="$BROWSEROS_REPO/packages/browseros/releases/$VERSION"
+          release_dir="$SLAVEAGENT_REPO/packages/slave agent/releases/$VERSION"
           if [ -d "$release_dir" ]; then
-            find "$release_dir" -maxdepth 1 -type f -name 'BrowserOS_*.dmg' -delete
+            find "$release_dir" -maxdepth 1 -type f -name 'SlaveAgent_*.dmg' -delete
           fi
 
       - name: Import macOS signing certificate
         id: macos_signing
-        working-directory: ${{ steps.inputs.outputs.browseros_repo }}
+        working-directory: ${{ steps.inputs.outputs.slaveagent_repo }}
         env:
           MACOS_CERTIFICATE_NAME: ${{ secrets.MACOS_CERTIFICATE_NAME }}
           MACOS_CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
           MACOS_KEYCHAIN_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
-          PROD_MACOS_BROWSEROS_PASSKEY_PROFILE_B64: ${{ secrets.PROD_MACOS_BROWSEROS_PASSKEY_PROFILE_B64 }}
+          PROD_MACOS_SLAVEAGENT_PASSKEY_PROFILE_B64: ${{ secrets.PROD_MACOS_SLAVEAGENT_PASSKEY_PROFILE_B64 }}
           PROD_MACOS_BROWSERCLAW_PASSKEY_PROFILE_B64: ${{ secrets.PROD_MACOS_BROWSERCLAW_PASSKEY_PROFILE_B64 }}
         shell: bash
         run: bash .github/scripts/macos-signing-keychain.sh setup
@@ -213,22 +213,22 @@ jobs:
         env:
           ONBOARDING_RESOURCE_VERSION: ${{ inputs.onboarding_version }}
           BROWSERCLAW_SERVER_RESOURCE_VERSION: ${{ inputs.product == 'browserclaw' && inputs.server_version || '' }}
-          BROWSEROS_BUILD_RESERVATION_SHA: ${{ inputs.reservation_sha }}
-          BROWSEROS_BUILD_SOURCE_SHA: ${{ inputs.source_sha }}
-          BROWSEROS_CONFIG_URL: ${{ secrets.BROWSEROS_CONFIG_URL }}
-          BROWSEROS_DEFER_R2_UPLOAD: "1"
-          BROWSEROS_REPO: ${{ steps.inputs.outputs.browseros_repo }}
-          BROWSEROS_SERVER_RESOURCE_VERSION: ${{ inputs.product == 'browseros' && inputs.server_version || '' }}
-          BUNDLED_EXTENSIONS_MANIFEST_URL: ${{ steps.inputs.outputs.browseros_repo }}/updates/extensions/bundled-manifest.xml
+          SLAVEAGENT_BUILD_RESERVATION_SHA: ${{ inputs.reservation_sha }}
+          SLAVEAGENT_BUILD_SOURCE_SHA: ${{ inputs.source_sha }}
+          SLAVEAGENT_CONFIG_URL: ${{ secrets.SLAVEAGENT_CONFIG_URL }}
+          SLAVEAGENT_DEFER_R2_UPLOAD: "1"
+          SLAVEAGENT_REPO: ${{ steps.inputs.outputs.slaveagent_repo }}
+          SLAVEAGENT_SERVER_RESOURCE_VERSION: ${{ inputs.product == 'slave agent' && inputs.server_version || '' }}
+          BUNDLED_EXTENSIONS_MANIFEST_URL: ${{ steps.inputs.outputs.slaveagent_repo }}/updates/extensions/bundled-manifest.xml
           BUNDLED_PRODUCT_EXTENSION_VERSION: ${{ inputs.extension_version }}
-          CHROMIUM_SRC: ${{ steps.chromium_workspace.outputs.chromium_src }}
+          SLAVEBROWSER_SRC: ${{ steps.slavebrowser_workspace.outputs.slavebrowser_src }}
           CLAW_POSTHOG_KEY: ${{ secrets.CLAW_POSTHOG_KEY }}
           MACOS_CERTIFICATE_NAME: ${{ steps.macos_signing.outputs.codesign_identity }}
           MACOS_KEYCHAIN_PATH: ${{ steps.macos_signing.outputs.keychain_path }}
           MACOS_KEYCHAIN_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
           POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
           PROD_MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-          PROD_MACOS_BROWSEROS_PASSKEY_PROFILE_PATH: ${{ steps.macos_signing.outputs.browseros_passkey_profile_path }}
+          PROD_MACOS_SLAVEAGENT_PASSKEY_PROFILE_PATH: ${{ steps.macos_signing.outputs.slaveagent_passkey_profile_path }}
           PROD_MACOS_BROWSERCLAW_PASSKEY_PROFILE_PATH: ${{ steps.macos_signing.outputs.browserclaw_passkey_profile_path }}
           PROD_MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
           PROD_MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
@@ -237,24 +237,24 @@ jobs:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          cd "$BROWSEROS_REPO/packages/browseros"
-          uv run browseros build \
+          cd "$SLAVEAGENT_REPO/packages/slave agent"
+          uv run slave agent build \
             --profile nightly-macos \
             --product "$PRODUCT" \
             --arch arm64 \
             --resource-mode published \
-            --chromium-src "$CHROMIUM_SRC"
+            --slave browser-src "$SLAVEBROWSER_SRC"
 
       # Both cleanups are unconditional because the self-hosted runner outlives
       # this job; leaking either resource poisons the next queued product build.
-      - name: Clean up disposable Chromium workspace
+      - name: Clean up disposable Slave Browser workspace
         if: always()
         env:
-          MACOS_CHROMIUM_WORKSPACE_STATE_PATH: ${{ steps.chromium_workspace.outputs.state_path }}
+          MACOS_SLAVEBROWSER_WORKSPACE_STATE_PATH: ${{ steps.slavebrowser_workspace.outputs.state_path }}
         shell: bash
         run: |
           set -euo pipefail
-          script="${{ steps.inputs.outputs.browseros_repo }}/.github/scripts/macos-chromium-workspace.sh"
+          script="${{ steps.inputs.outputs.slaveagent_repo }}/.github/scripts/macos-slave browser-workspace.sh"
           if [ -f "$script" ]; then bash "$script" cleanup; fi
 
       - name: Clean up macOS signing keychain
@@ -264,7 +264,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          script="${{ steps.inputs.outputs.browseros_repo }}/.github/scripts/macos-signing-keychain.sh"
+          script="${{ steps.inputs.outputs.slaveagent_repo }}/.github/scripts/macos-signing-keychain.sh"
           if [ -f "$script" ]; then bash "$script" cleanup; fi
 
       - name: Upload signed nightly DMG
@@ -272,8 +272,8 @@ jobs:
         with:
           name: ${{ steps.inputs.outputs.artifact_name }}
           path: |
-            ${{ steps.inputs.outputs.browseros_repo }}/packages/browseros/releases/${{ inputs.browser_version }}/${{ steps.inputs.outputs.artifact_glob }}
-            ${{ steps.inputs.outputs.browseros_repo }}/packages/browseros/releases/${{ inputs.browser_version }}/release.json
+            ${{ steps.inputs.outputs.slaveagent_repo }}/packages/slave agent/releases/${{ inputs.browser_version }}/${{ steps.inputs.outputs.artifact_glob }}
+            ${{ steps.inputs.outputs.slaveagent_repo }}/packages/slave agent/releases/${{ inputs.browser_version }}/release.json
           retention-days: 14
           if-no-files-found: error
           overwrite: true

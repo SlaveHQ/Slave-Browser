@@ -70,7 +70,7 @@ jobs:
         run: |
           set -euo pipefail
           case "$PRODUCT:$SNAPSHOT_PATH" in
-            browseros:updates/server/appcast-server.alpha.xml) ;;
+            slave agent:updates/server/appcast-server.alpha.xml) ;;
             browserclaw:updates/server/appcast-claw-server.alpha.xml) ;;
             *)
               echo "::error::Invalid product snapshot ownership"
@@ -198,8 +198,8 @@ jobs:
             echo "::error::Missing required secret(s): ${missing[*]}"
             exit 1
           fi
-          cert_path="$RUNNER_TEMP/browseros-signing-cert.p12"
-          keychain_path="$RUNNER_TEMP/browseros-ci-signing.keychain-db"
+          cert_path="$RUNNER_TEMP/slave agent-signing-cert.p12"
+          keychain_path="$RUNNER_TEMP/slave agent-ci-signing.keychain-db"
           printf '%s' "$MACOS_CERTIFICATE_P12" | base64 --decode > "$cert_path"
           security create-keychain -p "$MACOS_KEYCHAIN_PASSWORD" "$keychain_path"
           security set-keychain-settings -lut 21600 "$keychain_path"
@@ -241,7 +241,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          uv run --project packages/browseros browseros ota server release \
+          uv run --project packages/slave agent slave agent ota server release \
             --version "$VERSION" \
             --release-sha "$RELEASE_SHA" \
             --channel alpha \
@@ -263,7 +263,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          uv run --project packages/browseros browseros ota server release \
+          uv run --project packages/slave agent slave agent ota server release \
             --version "$VERSION" \
             --release-sha "$RELEASE_SHA" \
             --channel alpha \
@@ -281,7 +281,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          uv run --project packages/browseros browseros ota server release \
+          uv run --project packages/slave agent slave agent ota server release \
             --version "$VERSION" \
             --release-sha "$RELEASE_SHA" \
             --channel alpha \
@@ -345,7 +345,7 @@ jobs:
             fi
             fragments+=(--fragment "$platform=$fragment")
           done
-          uv run --project packages/browseros browseros ota server assemble-appcast \
+          uv run --project packages/slave agent slave agent ota server assemble-appcast \
             --version "$VERSION" \
             --channel alpha \
             --product "$PRODUCT" \
@@ -358,14 +358,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          packages/browseros-agent/scripts/release/commit-update-snapshot.sh \
+          packages/slave agent-agent/scripts/release/commit-update-snapshot.sh \
             "$DEFAULT_BRANCH" \
             "chore(release): snapshot ${PRODUCT} server alpha v${VERSION}" \
             "$SNAPSHOT_PATH"
 
       - name: Publish committed alpha appcast
         if: inputs.state_owner != 'suite'
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -373,7 +373,7 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          uv run browseros ota server release-appcast \
+          uv run slave agent ota server release-appcast \
             --channel alpha \
             --product "$PRODUCT" \
             --publish

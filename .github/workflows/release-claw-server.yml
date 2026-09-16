@@ -140,7 +140,7 @@ jobs:
 
       - name: Resolve release
         id: release
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
           EVENT_NAME: ${{ github.event_name }}
@@ -153,7 +153,7 @@ jobs:
           REQUESTED_VERSION: ${{ inputs.version || '' }}
         run: |
           set -euo pipefail
-          uv run browseros release component resolve \
+          uv run slave agent release component resolve \
             --component claw-server-rust \
             --event-name "$EVENT_NAME" \
             --default-branch "$DEFAULT_BRANCH" \
@@ -200,7 +200,7 @@ jobs:
             fi
           fi
 
-          node packages/browseros-agent/scripts/release/cap-release-changelog.mjs \
+          node packages/slave agent-agent/scripts/release/cap-release-changelog.mjs \
             --input "$CHANGELOG_FILE" \
             --output "$NOTES_FILE" \
             --max-entries 15 \
@@ -259,7 +259,7 @@ jobs:
           cargo --version
 
       - name: Run server workspace tests
-        working-directory: packages/browseros-agent
+        working-directory: packages/slave agent-agent
         run: cargo test --workspace --locked
 
   harness-integrations-test:
@@ -292,7 +292,7 @@ jobs:
 
       - name: Test native harness filesystem reconciliation
         shell: bash
-        working-directory: packages/browseros-agent
+        working-directory: packages/slave agent-agent
         run: cargo test --locked -p harness-integrations
 
   build:
@@ -332,7 +332,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       VERSION: ${{ needs.prepare.outputs.version }}
-      BROWSEROS_TARGET: ${{ matrix.target }}
+      SLAVEAGENT_TARGET: ${{ matrix.target }}
       RUST_TARGET: ${{ matrix.rust_target }}
       BINARY_EXT: ${{ matrix.binary_ext }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
@@ -376,9 +376,9 @@ jobs:
           )
           bucket = os.environ["R2_BUCKET"]
           version = os.environ["VERSION"]
-          target = os.environ["BROWSEROS_TARGET"]
+          target = os.environ["SLAVEAGENT_TARGET"]
           release_sha = os.environ["RELEASE_SHA"]
-          name = f"browseros-claw-server-rust-resources-{target}.zip"
+          name = f"slave agent-claw-server-rust-resources-{target}.zip"
           key = f"claw-server-rust/prod-resources/{version}/{name}"
           output = Path(os.environ["GITHUB_OUTPUT"])
           try:
@@ -407,7 +407,7 @@ jobs:
               if metadata.get(field) != value:
                   raise SystemExit(f"Immutable R2 object binding mismatch for {key}: {field}")
 
-          path = Path("packages/browseros-agent/dist/prod/claw-server-rust") / name
+          path = Path("packages/slave agent-agent/dist/prod/claw-server-rust") / name
           path.parent.mkdir(parents=True, exist_ok=True)
           path.write_bytes(data)
           with output.open("a") as handle:
@@ -430,13 +430,13 @@ jobs:
       - name: Stamp release version
         if: ${{ steps.recover.outputs.recovered != 'true' }}
         shell: bash
-        working-directory: packages/browseros
-        run: uv run browseros release component stamp --component claw-server-rust --version "$VERSION"
+        working-directory: packages/slave agent
+        run: uv run slave agent release component stamp --component claw-server-rust --version "$VERSION"
 
       - name: Build BrowserClaw server
         if: ${{ steps.recover.outputs.recovered != 'true' }}
         shell: bash
-        working-directory: packages/browseros-agent
+        working-directory: packages/slave agent-agent
         env:
           CLAW_POSTHOG_KEY: ${{ secrets.CLAW_POSTHOG_KEY }}
         run: |
@@ -447,12 +447,12 @@ jobs:
           fi
           cargo build --release --locked --target "$RUST_TARGET" \
             -p claw-server-rust \
-            --bin browseros-claw-server-rs
+            --bin slave agent-claw-server-rs
           python <<'PY'
           import os
           from pathlib import Path
 
-          binary_name = f"browseros-claw-server-rs{os.environ['BINARY_EXT']}"
+          binary_name = f"slave agent-claw-server-rs{os.environ['BINARY_EXT']}"
           binary_path = Path("target") / os.environ["RUST_TARGET"] / "release" / binary_name
           project_key = os.environ["CLAW_POSTHOG_KEY"].encode()
           if project_key not in binary_path.read_bytes():
@@ -462,10 +462,10 @@ jobs:
       - name: Verify stamped binary version
         if: ${{ steps.recover.outputs.recovered != 'true' }}
         shell: bash
-        working-directory: packages/browseros-agent
+        working-directory: packages/slave agent-agent
         run: |
           set -euo pipefail
-          BINARY_PATH="target/$RUST_TARGET/release/browseros-claw-server-rs$BINARY_EXT"
+          BINARY_PATH="target/$RUST_TARGET/release/slave agent-claw-server-rs$BINARY_EXT"
           ACTUAL_VERSION="$("$BINARY_PATH" --version)"
           if [ "$ACTUAL_VERSION" != "$VERSION" ]; then
             echo "::error::Expected $VERSION from $BINARY_PATH, got: $ACTUAL_VERSION" >&2
@@ -488,19 +488,19 @@ jobs:
           from pathlib import Path
 
           repo = Path(os.environ["GITHUB_WORKSPACE"])
-          agent = repo / "packages/browseros-agent"
+          agent = repo / "packages/slave agent-agent"
           version = os.environ["VERSION"]
-          target = os.environ["BROWSEROS_TARGET"]
+          target = os.environ["SLAVEAGENT_TARGET"]
           rust_target = os.environ["RUST_TARGET"]
           binary_ext = os.environ["BINARY_EXT"]
-          binary_name = f"browseros-claw-server-rs{binary_ext}"
-          runtime_binary_name = f"browseros-claw-server{binary_ext}"
+          binary_name = f"slave agent-claw-server-rs{binary_ext}"
+          runtime_binary_name = f"slave agent-claw-server{binary_ext}"
           binary_path = agent / "target" / rust_target / "release" / binary_name
           if not binary_path.is_file():
               raise SystemExit(f"Missing compiled binary: {binary_path}")
           source_skill = agent / "resources/skills/browserclaw/SKILL.md"
           if not source_skill.is_file():
-              raise SystemExit(f"Missing BrowserOS skill: {source_skill}")
+              raise SystemExit(f"Missing Slave Agent skill: {source_skill}")
 
           dist_root = agent / "dist/prod/claw-server-rust"
           stage_root = dist_root / target
@@ -537,7 +537,7 @@ jobs:
           metadata_path = stage_root / "artifact-metadata.json"
           metadata_path.write_text(json.dumps(metadata, indent=2) + "\n")
 
-          zip_path = dist_root / f"browseros-claw-server-rust-resources-{target}.zip"
+          zip_path = dist_root / f"slave agent-claw-server-rust-resources-{target}.zip"
           zip_path.unlink(missing_ok=True)
           with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:
               for path in [metadata_path, *files]:
@@ -558,7 +558,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          uv run --project packages/browseros python <<'PY'
+          uv run --project packages/slave agent python <<'PY'
           import os
           import tempfile
           from pathlib import Path
@@ -566,10 +566,10 @@ jobs:
           from bos_build.steps.storage.download import extract_artifact_zip
 
           zip_path = Path(os.environ["ZIP_PATH"])
-          target = os.environ["BROWSEROS_TARGET"]
+          target = os.environ["SLAVEAGENT_TARGET"]
           binary_ext = os.environ["BINARY_EXT"]
           expected = sorted([
-              f"resources/bin/browseros-claw-server{binary_ext}",
+              f"resources/bin/slave agent-claw-server{binary_ext}",
               "resources/skills/browserclaw/SKILL.md",
           ])
           with tempfile.TemporaryDirectory() as tmp:
@@ -685,7 +685,7 @@ jobs:
               return data
 
           for target in targets:
-              path = Path(f"dist/claw-server-rust/browseros-claw-server-rust-resources-{target}.zip")
+              path = Path(f"dist/claw-server-rust/slave agent-claw-server-rust-resources-{target}.zip")
               if not path.is_file():
                   raise SystemExit(f"Missing BrowserClaw server resource zip: {path}")
               data = path.read_bytes()
@@ -730,7 +730,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          mapfile -t assets < <(find dist/claw-server-rust -maxdepth 1 -name 'browseros-claw-server-rust-resources-*.zip' | sort)
+          mapfile -t assets < <(find dist/claw-server-rust -maxdepth 1 -name 'slave agent-claw-server-rust-resources-*.zip' | sort)
           if [ "${#assets[@]}" -ne 5 ]; then
             echo "::error::Expected 5 BrowserClaw server resource zips, found ${#assets[@]}"
             exit 1
@@ -782,7 +782,7 @@ jobs:
         run: |
           set -euo pipefail
           release="$(gh release view "$RELEASE_TAG" --json isDraft,targetCommitish,assets)"
-          asset_count="$(jq '[.assets[] | select(.name | test("^browseros-claw-server-rust-resources-(darwin-arm64|darwin-x64|linux-arm64|linux-x64|windows-x64)\\.zip$"))] | length' <<< "$release")"
+          asset_count="$(jq '[.assets[] | select(.name | test("^slave agent-claw-server-rust-resources-(darwin-arm64|darwin-x64|linux-arm64|linux-x64|windows-x64)\\.zip$"))] | length' <<< "$release")"
           if [ "$asset_count" -ne 5 ]; then
             echo "::error::Expected 5 draft assets, found $asset_count"
             exit 1
@@ -799,7 +799,7 @@ jobs:
           mkdir -p "$artifact_dir/draft"
           targets=(darwin-arm64 darwin-x64 linux-arm64 linux-x64 windows-x64)
           for target in "${targets[@]}"; do
-            name="browseros-claw-server-rust-resources-${target}.zip"
+            name="slave agent-claw-server-rust-resources-${target}.zip"
             key="claw-server-rust/prod-resources/${VERSION}/${name}"
             metadata="$(aws s3api head-object --endpoint-url "$R2_ENDPOINT" --region auto --bucket "$R2_BUCKET" --key "$key" --query Metadata --output json)"
             if ! jq -e \
@@ -850,7 +850,7 @@ jobs:
           set -euo pipefail
           targets=(darwin-arm64 darwin-x64 linux-arm64 linux-x64 windows-x64)
           for target in "${targets[@]}"; do
-            name="browseros-claw-server-rust-resources-${target}.zip"
+            name="slave agent-claw-server-rust-resources-${target}.zip"
             source="claw-server-rust/prod-resources/${VERSION}/${name}"
             destination="claw-server-rust/prod-resources/latest/${name}"
 
@@ -984,8 +984,8 @@ jobs:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           set -euo pipefail
-          cargo_toml="packages/browseros-agent/apps/claw-server-rust/Cargo.toml"
-          lock="packages/browseros-agent/Cargo.lock"
+          cargo_toml="packages/slave agent-agent/apps/claw-server-rust/Cargo.toml"
+          lock="packages/slave agent-agent/Cargo.lock"
           branch="chore-bump-claw-server-rust-v${VERSION}"
 
           git fetch origin "$DEFAULT_BRANCH" --no-tags
@@ -999,7 +999,7 @@ jobs:
               exit 0
             fi
           fi
-          uv run --directory packages/browseros browseros release component stamp \
+          uv run --directory packages/slave agent slave agent release component stamp \
             --component claw-server-rust \
             --version "$VERSION"
           if git diff --quiet -- "$cargo_toml" "$lock"; then exit 0; fi
@@ -1014,7 +1014,7 @@ jobs:
                 --head "$branch")"
             fi
             head_sha="$(gh pr view "$pr_url" --json headRefOid --jq '.headRefOid')"
-            packages/browseros-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"
+            packages/slave agent-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"
             exit 0
           fi
 
@@ -1030,4 +1030,4 @@ jobs:
             --body "Reflects the published claw-server/v${VERSION} resources." \
             --base "$DEFAULT_BRANCH" \
             --head "$branch")"
-          packages/browseros-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"
+          packages/slave agent-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"

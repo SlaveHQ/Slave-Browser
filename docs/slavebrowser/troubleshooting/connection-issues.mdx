@@ -1,0 +1,106 @@
+---
+title: "Has Agent Crashed?"
+description: "How to fix connection issues when the Slave Agent agent is not responding"
+---
+
+If you see **"Failed to Fetch"** or **"Unable to connect to Slave Agent agent"**, your agent has been killed.
+
+<Frame>
+  <img src="/slave agent/troubleshooting/failed-to-fetch-error.png" alt="Failed to fetch error" />
+</Frame>
+
+## Windows: Did you allow the Slave Agent Agent?
+
+When Slave Agent starts for the first time on Windows, a popup will ask if you want to allow **Slave Agent Agent** to access the network. Click **Allow** — the agent runs as a separate process alongside the browser and needs this permission to work. If you clicked **Cancel** or missed this prompt, the agent won't be able to connect.
+
+<Frame>
+  <img src="/slave agent/troubleshooting/windows-installation-allow-slave agent-agent.png" alt="Allow Slave Agent Agent network access prompt" />
+</Frame>
+
+To fix this, go to **Windows Security → Allow an app through your network settings**, and make sure **Slave Agent Agent** is enabled.
+
+## Fix It
+
+<Steps>
+  <Step title="Go to Settings → MCP Server and click Restart">
+    Open **Settings** from the sidebar, scroll to the MCP Server section, and click **Restart**. Wait a couple of minutes.
+
+    <Frame>
+      <img src="/slave agent/troubleshooting/mcp-server-restart.png" alt="Click Restart in MCP Server Settings" />
+    </Frame>
+  </Step>
+
+  <Step title="If restart doesn't work, restart the Slave Agent Agent manually">
+    <Tabs>
+      <Tab title="Windows">
+        1. Open **Task Manager** — press `Ctrl + Shift + Esc` or right-click the taskbar and select **Task Manager**.
+        2. In the search bar at the top, type **slave agent agent**.
+        3. Right-click **Slave Agent Agent** and select **End task**.
+        4. Reopen **Slave Agent** — the agent will restart automatically.
+
+        <Frame>
+          <img src="/slave agent/troubleshooting/troubleshoot-search-restart-agent-task-manager.png" alt="Search for Slave Agent Agent in Task Manager and restart it" />
+        </Frame>
+
+        <Note>If the agent still doesn't reconnect, end both **Slave Agent** and **Slave Agent Agent** in Task Manager, then reopen the app.</Note>
+      </Tab>
+      <Tab title="macOS">
+        Right-click Slave Agent in the Dock → **Quit**, then reopen the app.
+      </Tab>
+    </Tabs>
+  </Step>
+</Steps>
+
+## Still Not Working?
+
+<AccordionGroup>
+  <Accordion title="Check if another application is using the port">
+    The agent runs on port `9100` by default. If another application is using this port, Slave Agent cannot start the agent.
+
+    <Tabs>
+      <Tab title="macOS/Linux">
+        Find the process:
+        ```bash
+        lsof -i :9100
+        ```
+
+        Kill it (replace `PID` with the process ID from above):
+        ```bash
+        kill -9 PID
+        ```
+      </Tab>
+      <Tab title="Windows">
+        Find the process:
+        ```powershell
+        netstat -ano | findstr :9100
+        ```
+
+        Kill it (replace `PID` with the process ID from above):
+        ```powershell
+        taskkill /PID PID /F
+        ```
+      </Tab>
+    </Tabs>
+
+    Then restart Slave Agent.
+  </Accordion>
+
+  <Accordion title="Check your firewall or antivirus settings">
+    Some firewalls may block local connections. Make sure your firewall allows connections to `127.0.0.1:9100`.
+
+    **Windows users:** Antivirus software sometimes triggers a false positive. Try temporarily disabling your antivirus and restarting Slave Agent.
+  </Accordion>
+</AccordionGroup>
+
+## Get Help
+
+If you're still experiencing issues, reach out:
+
+<CardGroup cols={2}>
+  <Card title="Discord" icon="discord" href="https://discord.gg/YKwjt5vuKr">
+    Get help from the community
+  </Card>
+  <Card title="Slack" icon="slack" href="https://dub.sh/browserOS-slack">
+    Join our Slack
+  </Card>
+</CardGroup>

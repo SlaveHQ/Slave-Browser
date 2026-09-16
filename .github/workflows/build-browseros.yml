@@ -1,8 +1,8 @@
-name: "Reusable: Chromium Browser Build"
+name: "Reusable: Slave Browser Browser Build"
 
-# Reusable WarpBuild job for one Chromium browser build. The Chromium checkout
+# Reusable WarpBuild job for one Slave Browser browser build. The Slave Browser checkout
 # cache is product-independent on purpose: it is captured immediately after
-# gclient sync, before BrowserOS/BrowserClaw patches or build outputs touch it.
+# gclient sync, before Slave Agent/BrowserClaw patches or build outputs touch it.
 
 on:
   workflow_call:
@@ -16,7 +16,7 @@ on:
         required: true
         type: string
       product:
-        description: "Product to build: browseros or browserclaw"
+        description: "Product to build: slave agent or browserclaw"
         required: true
         type: string
       runner:
@@ -100,7 +100,7 @@ on:
         required: false
       R2_BUCKET:
         required: false
-      BROWSEROS_CONFIG_URL:
+      SLAVEAGENT_CONFIG_URL:
         required: false
       POSTHOG_API_KEY:
         required: false
@@ -158,9 +158,9 @@ jobs:
               ;;
           esac
           case "$PRODUCT" in
-            browseros|browserclaw) ;;
+            slave agent|browserclaw) ;;
             *)
-              echo "::error::product must be one of: browseros, browserclaw"
+              echo "::error::product must be one of: slave agent, browserclaw"
               exit 1
               ;;
           esac
@@ -209,7 +209,7 @@ jobs:
           else
             git_config_dir="$(cd "$RUNNER_TEMP" && pwd)"
           fi
-          git_config="$git_config_dir/browseros-global.gitconfig"
+          git_config="$git_config_dir/slave agent-global.gitconfig"
           export GIT_CONFIG_GLOBAL="$git_config"
           printf 'GIT_CONFIG_GLOBAL=%s\n' "$git_config" >> "$GITHUB_ENV"
 
@@ -234,17 +234,17 @@ jobs:
       - uses: astral-sh/setup-uv@v8.3.2
 
       - name: Setup Bun
-        if: inputs.resource-mode == 'source' && inputs.product == 'browseros'
+        if: inputs.resource-mode == 'source' && inputs.product == 'slave agent'
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version-file: packages/browseros-agent/package.json
+          bun-version-file: packages/slave agent-agent/package.json
 
-      - name: Install BrowserOS server dependencies
-        if: inputs.resource-mode == 'source' && inputs.product == 'browseros'
-        working-directory: packages/browseros-agent
+      - name: Install Slave Agent server dependencies
+        if: inputs.resource-mode == 'source' && inputs.product == 'slave agent'
+        working-directory: packages/slave agent-agent
         run: bun ci
 
-      - name: Setup BrowserOS neo server toolchain
+      - name: Setup Slave Agent neo server toolchain
         if: inputs.resource-mode == 'source' && inputs.product == 'browserclaw'
         run: |
           set -euo pipefail
@@ -262,11 +262,11 @@ jobs:
           name: ${{ inputs.prepared-resources-artifact }}
           path: ${{ runner.temp }}/prepared-resources
 
-      - name: Resolve chromium pin and paths
+      - name: Resolve slave browser pin and paths
         id: pin
         run: |
           set -euo pipefail
-          . packages/browseros/CHROMIUM_VERSION
+          . packages/slave agent/SLAVEBROWSER_VERSION
           version="$MAJOR.$MINOR.$BUILD.$PATCH"
 
           # Keep the checkout outside the workspace so actions/checkout
@@ -279,24 +279,24 @@ jobs:
 
           {
             echo "version=$version"
-            echo "cache_key=chromium-src-${{ inputs.platform }}-${{ inputs.arch }}-v2-$version"
+            echo "cache_key=slave browser-src-${{ inputs.platform }}-${{ inputs.arch }}-v2-$version"
           } >> "$GITHUB_OUTPUT"
           {
-            echo "CHROMIUM_ROOT=$parent/chromium"
-            echo "CHROMIUM_SRC=$parent/chromium/src"
+            echo "SLAVEBROWSER_ROOT=$parent/slave browser"
+            echo "SLAVEBROWSER_SRC=$parent/slave browser/src"
           } >> "$GITHUB_ENV"
 
-      - name: Restore chromium checkout (WarpCache)
+      - name: Restore slave browser checkout (WarpCache)
         if: runner.os != 'Windows'
         id: warpcache
         uses: WarpBuilds/cache/restore@v1
         with:
-          path: ${{ env.CHROMIUM_ROOT }}
+          path: ${{ env.SLAVEBROWSER_ROOT }}
           key: ${{ steps.pin.outputs.cache_key }}
           restore-keys: |
-            chromium-src-${{ inputs.platform }}-${{ inputs.arch }}-v2-
+            slave browser-src-${{ inputs.platform }}-${{ inputs.arch }}-v2-
 
-      - name: Restore chromium checkout (R2)
+      - name: Restore slave browser checkout (R2)
         if: runner.os == 'Windows'
         id: r2cache
         env:
@@ -306,45 +306,45 @@ jobs:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
         run: |
           set -euo pipefail
-          uv run --project packages/browseros browseros source cache restore \
+          uv run --project packages/slave agent slave agent source cache restore \
             --key "${{ steps.pin.outputs.cache_key }}" \
-            --root "$CHROMIUM_ROOT"
+            --root "$SLAVEBROWSER_ROOT"
 
-      - name: Ensure chromium checkout at pinned tag
+      - name: Ensure slave browser checkout at pinned tag
         run: |
           set -euo pipefail
-          uv run --project packages/browseros browseros source ensure \
-            --root "$CHROMIUM_ROOT" --step checkout \
+          uv run --project packages/slave agent slave agent source ensure \
+            --root "$SLAVEBROWSER_ROOT" --step checkout \
             --repair-cached-depot-tools
 
-      - name: Reset chromium tree (clean module)
-        working-directory: packages/browseros
+      - name: Reset slave browser tree (clean module)
+        working-directory: packages/slave agent
         run: |
           set -euo pipefail
-          uv run browseros build --modules clean \
-            --chromium-src "$CHROMIUM_SRC" \
+          uv run slave agent build --modules clean \
+            --slave browser-src "$SLAVEBROWSER_SRC" \
             --build-type release \
             --arch "${{ inputs.arch }}" \
             --product "${{ inputs.product }}"
 
-      - name: Sync chromium dependencies (gclient)
+      - name: Sync slave browser dependencies (gclient)
         run: |
           set -euo pipefail
-          uv run --project packages/browseros browseros source ensure \
-            --root "$CHROMIUM_ROOT" --step sync \
+          uv run --project packages/slave agent slave agent source ensure \
+            --root "$SLAVEBROWSER_ROOT" --step sync \
             --repair-cached-depot-tools
 
-      # Save immediately after sync: the tree is pristine (no BrowserOS or
+      # Save immediately after sync: the tree is pristine (no Slave Agent or
       # BrowserClaw patches, no out/ dir), which keeps the cache deterministic
       # and as small as possible.
-      - name: Save chromium checkout (WarpCache)
+      - name: Save slave browser checkout (WarpCache)
         if: runner.os != 'Windows' && steps.warpcache.outputs.cache-hit != 'true'
         uses: WarpBuilds/cache/save@v1
         with:
-          path: ${{ env.CHROMIUM_ROOT }}
+          path: ${{ env.SLAVEBROWSER_ROOT }}
           key: ${{ steps.pin.outputs.cache_key }}
 
-      - name: Save chromium checkout (R2)
+      - name: Save slave browser checkout (R2)
         if: runner.os == 'Windows' && steps.r2cache.outputs.cache-hit != 'true'
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -353,9 +353,9 @@ jobs:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
         run: |
           set -euo pipefail
-          uv run --project packages/browseros browseros source cache save \
+          uv run --project packages/slave agent slave agent source cache save \
             --key "${{ steps.pin.outputs.cache_key }}" \
-            --root "$CHROMIUM_ROOT"
+            --root "$SLAVEBROWSER_ROOT"
 
       - name: Install Linux build deps
         if: inputs.platform == 'linux'
@@ -366,7 +366,7 @@ jobs:
           # incidental runner state: appimagetool needs FUSE, dpkg-deb builds
           # and inspects the archive, and libc-bin supplies ldd.
           sudo apt-get install -y libfuse2 dpkg libc-bin
-          "$CHROMIUM_SRC/build/install-build-deps.sh" --no-prompt
+          "$SLAVEBROWSER_SRC/build/install-build-deps.sh" --no-prompt
 
       - name: Install SSL.com CodeSignTool
         if: inputs.sign && inputs.platform == 'windows'
@@ -387,10 +387,10 @@ jobs:
           "CODE_SIGN_TOOL_PATH=$($tool.Directory.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Build ${{ inputs.product }}
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
-          BROWSEROS_BUILD_SOURCE_SHA: ${{ steps.source.outputs.sha }}
-          BROWSEROS_SERVER_RESOURCE_VERSION: ${{ inputs.product == 'browseros' && inputs.server-version || '' }}
+          SLAVEAGENT_BUILD_SOURCE_SHA: ${{ steps.source.outputs.sha }}
+          SLAVEAGENT_SERVER_RESOURCE_VERSION: ${{ inputs.product == 'slave agent' && inputs.server-version || '' }}
           BROWSERCLAW_SERVER_RESOURCE_VERSION: ${{ inputs.product == 'browserclaw' && inputs.server-version || '' }}
           ONBOARDING_RESOURCE_VERSION: ${{ inputs.onboarding-version }}
           BUNDLED_EXTENSIONS_MANIFEST_URL: ${{ inputs.extension-version && format('{0}/updates/extensions/bundled-manifest.xml', github.workspace) || '' }}
@@ -399,9 +399,9 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
-          BROWSEROS_CONFIG_URL: ${{ inputs.product == 'browseros' && secrets.BROWSEROS_CONFIG_URL || '' }}
-          POSTHOG_API_KEY: ${{ inputs.product == 'browseros' && secrets.POSTHOG_API_KEY || '' }}
-          SENTRY_DSN: ${{ inputs.product == 'browseros' && secrets.SENTRY_DSN || '' }}
+          SLAVEAGENT_CONFIG_URL: ${{ inputs.product == 'slave agent' && secrets.SLAVEAGENT_CONFIG_URL || '' }}
+          POSTHOG_API_KEY: ${{ inputs.product == 'slave agent' && secrets.POSTHOG_API_KEY || '' }}
+          SENTRY_DSN: ${{ inputs.product == 'slave agent' && secrets.SENTRY_DSN || '' }}
           CLAW_POSTHOG_KEY: ${{ inputs.product == 'browserclaw' && secrets.CLAW_POSTHOG_KEY || '' }}
           ESIGNER_USERNAME: ${{ inputs.platform == 'windows' && secrets.ESIGNER_USERNAME || '' }}
           ESIGNER_PASSWORD: ${{ inputs.platform == 'windows' && secrets.ESIGNER_PASSWORD || '' }}
@@ -426,7 +426,7 @@ jobs:
             --resource-mode "${{ inputs.resource-mode }}"
             "$sign_flag"
             "$upload_flag"
-            --chromium-src "$CHROMIUM_SRC"
+            --slave browser-src "$SLAVEBROWSER_SRC"
           )
           if [ "${{ inputs.resource-mode }}" = "source" ]; then
             args+=(
@@ -436,7 +436,7 @@ jobs:
               --toolchain-id "workflow-run=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
             )
           fi
-          uv run browseros build "${args[@]}"
+          uv run slave agent build "${args[@]}"
 
       - name: Resolve lane artifact name
         id: lane_name
@@ -470,14 +470,14 @@ jobs:
         run: |
           set -euo pipefail
           case "$PRODUCT" in
-            browseros)
-              echo "value=BrowserOS" >> "$GITHUB_OUTPUT"
+            slave agent)
+              echo "value=Slave Agent" >> "$GITHUB_OUTPUT"
               ;;
             browserclaw)
-              echo "value=BrowserOS_neo" >> "$GITHUB_OUTPUT"
+              echo "value=SlaveAgent_neo" >> "$GITHUB_OUTPUT"
               ;;
             *)
-              echo "::error::product must be one of: browseros, browserclaw"
+              echo "::error::product must be one of: slave agent, browserclaw"
               exit 1
               ;;
           esac
@@ -492,8 +492,8 @@ jobs:
           retention-days: 14
           compression-level: 0
           path: |
-            packages/browseros/releases/*/${{ steps.artifact_prefix.outputs.value }}_*.dmg
-            packages/browseros/releases/*/${{ steps.artifact_prefix.outputs.value }}_*.AppImage
-            packages/browseros/releases/*/${{ steps.artifact_prefix.outputs.value }}_*.deb
-            packages/browseros/releases/*/${{ steps.artifact_prefix.outputs.value }}_*_installer.exe
-            packages/browseros/releases/*/${{ steps.artifact_prefix.outputs.value }}_*_installer.zip
+            packages/slave agent/releases/*/${{ steps.artifact_prefix.outputs.value }}_*.dmg
+            packages/slave agent/releases/*/${{ steps.artifact_prefix.outputs.value }}_*.AppImage
+            packages/slave agent/releases/*/${{ steps.artifact_prefix.outputs.value }}_*.deb
+            packages/slave agent/releases/*/${{ steps.artifact_prefix.outputs.value }}_*_installer.exe
+            packages/slave agent/releases/*/${{ steps.artifact_prefix.outputs.value }}_*_installer.zip

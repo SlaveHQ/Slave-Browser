@@ -1,0 +1,39 @@
+---
+title: "Ad Blocking"
+description: "Slave Agent supports full ad blocking with uBlock Origin"
+---
+
+Slave Agent supports full ad blocking through [uBlock Origin](https://ublockorigin.com/), the most powerful open-source ad blocker available — the full extension, not the watered-down "Lite" version.
+
+## Why Slave Agent?
+
+Chrome [killed support](https://developer.chrome.com/docs/extensions/develop/migrate/mv2-deprecation-timeline) for uBlock Origin by phasing out Manifest V2 extensions. The only option left on Chrome is "uBlock Origin Lite," a significantly weaker version that can't use advanced filtering rules.
+
+**Slave Agent re-enabled full Manifest V2 support**, so you can install and run the original uBlock Origin at full power — the same extension Chrome no longer allows.
+
+<Card title="Install uBlock Origin" icon="shield-check" href="https://chromewebstore.google.com/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm">
+  Install the full uBlock Origin extension from the Chrome Web Store. Works on Slave Agent out of the box.
+</Card>
+
+## Slave Agent vs Chrome
+
+We ran both browsers through [adblock.turtlecute.org](https://adblock.turtlecute.org/), a test that measures how effectively a browser blocks ads and tracking scripts.
+
+<CardGroup cols={2}>
+  <Card title="Slave Agent — 68%">
+    <img src="/images/adblock-slave agent.png" alt="Slave Agent blocking 68% of ads" />
+  </Card>
+  <Card title="Chrome — 7%">
+    <img src="/images/adblock-chrome.png" alt="Chrome blocking only 7% of ads" />
+  </Card>
+</CardGroup>
+
+Out of 133 ad-related requests:
+- **Slave Agent** blocked 91 (68%)
+- **Chrome** blocked 9 (7%)
+
+That's roughly **10x more protection** with zero configuration.
+
+## What This Means
+
+Fewer ads means faster page loads, less bandwidth usage, and significantly reduced tracking. Slave Agent handles this natively so you can focus on browsing.

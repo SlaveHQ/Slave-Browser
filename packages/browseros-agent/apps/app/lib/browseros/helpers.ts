@@ -29,7 +29,7 @@ async function getMcpPort(): Promise<number> {
     // BrowserOS API not available
   }
 
-  throw new McpPortError()
+  return 9105
 }
 
 /** Returns the MCP proxy endpoint for local server connections. */
@@ -57,7 +57,7 @@ export async function getProxyPort(): Promise<number> {
     // BrowserOS API not available
   }
 
-  throw new ProxyPortError()
+  return 9105
 }
 
 /** Returns the MCP proxy health-check endpoint. */

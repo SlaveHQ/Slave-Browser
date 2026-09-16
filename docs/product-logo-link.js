@@ -1,4 +1,4 @@
-/* The logo always links to "/", which is BrowserOS neo. On a BrowserOS page
+/* The logo always links to "/", which is SlaveBrowser neo. On a SlaveBrowser page
    that sends the reader out of the product they were reading, so the link is
    repointed to that product's own landing page.
 
@@ -10,7 +10,7 @@
    at load. */
 ;(() => {
   const NEO_HOME = '/'
-  const OS_HOME = '/browseros'
+  const OS_HOME = '/slavebrowser'
 
   function currentHome() {
     const path = document.documentElement.getAttribute('data-current-path') || '/'

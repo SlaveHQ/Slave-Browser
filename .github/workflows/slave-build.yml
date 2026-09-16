@@ -1,0 +1,77 @@
+name: Slave Browser Build
+
+on:
+  push:
+    branches: [ "master", "main", "doer-ai-migration" ]
+  pull_request:
+
+jobs:
+  build:
+    name: Validate and Build (x86_64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free up runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          sudo apt-get clean
+          df -h
+
+      - name: Set up Swap Space
+        run: |
+          sudo fallocate -l 12G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+
+      - name: Checkout SlaveBrowser
+        uses: actions/checkout@v4
+        with:
+          path: SlaveBrowser
+
+      - name: Setup depot_tools
+        run: |
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          echo "$PWD/depot_tools" >> $GITHUB_PATH
+
+      - name: Fetch Chromium (NOTE - Standard runner disk space might be insufficient)
+        run: |
+          mkdir chromium && cd chromium
+          cat << 'EOF' > .gclient
+          solutions = [
+            {
+              "name": "src",
+              "url": "https://chromium.googlesource.com/chromium/src.git",
+              "managed": False,
+              "custom_deps": {},
+              "custom_vars": {
+                "checkout_pgo_profiles": False,
+              },
+            },
+          ]
+          EOF
+          gclient sync --nohooks --no-history -R
+          gclient runhooks
+
+      - name: Apply SlaveBrowser overlay
+        run: |
+          cp -r SlaveBrowser/* chromium/src/ || true
+
+      - name: Configure GN (Dev/PR)
+        run: |
+          cd chromium/src
+          gn gen out/SlaveDev --args="is_debug=false dcheck_always_on=true is_component_build=true symbol_level=1 blink_symbol_level=0 v8_symbol_level=0 use_siso=true"
+
+      - name: Setup Siso Cache
+        uses: actions/cache@v3
+        with:
+          path: chromium/src/out/SlaveDev/.siso_fs_state
+          key: siso-dev-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            siso-dev-${{ runner.os }}-
+
+      - name: Build
+        run: |
+          cd chromium/src
+          autoninja -C out/SlaveDev chrome

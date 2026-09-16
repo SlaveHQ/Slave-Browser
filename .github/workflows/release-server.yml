@@ -1,4 +1,4 @@
-name: "Release: BrowserOS Server"
+name: "Release: Slave Agent Server"
 
 on:
   push:
@@ -72,7 +72,7 @@ on:
         required: true
       R2_BUCKET:
         required: true
-      BROWSEROS_CONFIG_URL:
+      SLAVEAGENT_CONFIG_URL:
         required: true
       POSTHOG_API_KEY:
         required: true
@@ -143,7 +143,7 @@ jobs:
 
       - name: Resolve release
         id: release
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
           EVENT_NAME: ${{ github.event_name }}
@@ -156,7 +156,7 @@ jobs:
           REQUESTED_VERSION: ${{ inputs.version || '' }}
         run: |
           set -euo pipefail
-          uv run browseros release component resolve \
+          uv run slave agent release component resolve \
             --component server \
             --event-name "$EVENT_NAME" \
             --default-branch "$DEFAULT_BRANCH" \
@@ -194,14 +194,14 @@ jobs:
           changelog="${RUNNER_TEMP}/server-changelog.md"
           notes="${RUNNER_TEMP}/server-release-notes.md"
           if [ -z "$PREVIOUS_TAG" ]; then
-            echo "Initial BrowserOS Server release." > "$changelog"
+            echo "Initial Slave Agent Server release." > "$changelog"
           else
             git log "$PREVIOUS_TAG..$RELEASE_SHA" --pretty=format:"- %s (%h)" > "$changelog"
             if [ ! -s "$changelog" ]; then
               echo "No commits since $PREVIOUS_TAG." > "$changelog"
             fi
           fi
-          node packages/browseros-agent/scripts/release/cap-release-changelog.mjs \
+          node packages/slave agent-agent/scripts/release/cap-release-changelog.mjs \
             --input "$changelog" \
             --output "$notes" \
             --max-entries 15 \
@@ -218,7 +218,7 @@ jobs:
           VERSION: ${{ steps.release.outputs.version }}
         run: |
           set -euo pipefail
-          title="BrowserOS Server - v$VERSION"
+          title="Slave Agent Server - v$VERSION"
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             release="$(gh release view "$RELEASE_TAG" --json isDraft,targetCommitish,assets)"
             is_draft="$(jq -r '.isDraft' <<< "$release")"
@@ -242,7 +242,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
-      BROWSEROS_CONFIG_URL: ${{ secrets.BROWSEROS_CONFIG_URL }}
+      SLAVEAGENT_CONFIG_URL: ${{ secrets.SLAVEAGENT_CONFIG_URL }}
       LOG_LEVEL: info
       NODE_ENV: production
       POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
@@ -267,7 +267,7 @@ jobs:
       - name: Preflight required secrets
         run: |
           set -euo pipefail
-          required=(R2_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_BUCKET BROWSEROS_CONFIG_URL POSTHOG_API_KEY SENTRY_DSN)
+          required=(R2_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_BUCKET SLAVEAGENT_CONFIG_URL POSTHOG_API_KEY SENTRY_DSN)
           missing=()
           for name in "${required[@]}"; do
             if [ -z "${!name:-}" ]; then missing+=("$name"); fi
@@ -280,7 +280,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version-file: packages/browseros-agent/package.json
+          bun-version-file: packages/slave agent-agent/package.json
 
       - name: Install Wine
         run: |
@@ -292,31 +292,31 @@ jobs:
           fi
           wine --version
 
-      - name: Install browseros-agent dependencies
-        working-directory: packages/browseros-agent
+      - name: Install slave agent-agent dependencies
+        working-directory: packages/slave agent-agent
         run: bun ci
 
       - name: Stamp release version for artifacts
-        working-directory: packages/browseros
-        run: uv run browseros release component stamp --component server --version "$VERSION"
+        working-directory: packages/slave agent
+        run: uv run slave agent release component stamp --component server --version "$VERSION"
 
       - name: Build and upload immutable server resources
-        working-directory: packages/browseros-agent
+        working-directory: packages/slave agent-agent
         run: bun scripts/build/server.ts --target=all --upload --versioned-only
 
       - name: Attach zips to private draft
-        working-directory: packages/browseros-agent
+        working-directory: packages/slave agent-agent
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          mapfile -t assets < <(find dist/prod/server -maxdepth 1 -name 'browseros-server-resources-*.zip' | sort)
+          mapfile -t assets < <(find dist/prod/server -maxdepth 1 -name 'slave agent-server-resources-*.zip' | sort)
           if [ "${#assets[@]}" -ne 5 ]; then
             echo "::error::Expected 5 server resource zips, found ${#assets[@]}"
             exit 1
           fi
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --verify-tag --draft --generate-notes --title "BrowserOS Server - v$VERSION"
+            gh release create "$RELEASE_TAG" --verify-tag --draft --generate-notes --title "Slave Agent Server - v$VERSION"
           fi
           gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber
 
@@ -356,7 +356,7 @@ jobs:
         run: |
           set -euo pipefail
           release="$(gh release view "$RELEASE_TAG" --json isDraft,targetCommitish,assets)"
-          asset_count="$(jq '[.assets[] | select(.name | test("^browseros-server-resources-(darwin-arm64|darwin-x64|linux-arm64|linux-x64|windows-x64)\\.zip$"))] | length' <<< "$release")"
+          asset_count="$(jq '[.assets[] | select(.name | test("^slave agent-server-resources-(darwin-arm64|darwin-x64|linux-arm64|linux-x64|windows-x64)\\.zip$"))] | length' <<< "$release")"
           if [ "$asset_count" -ne 5 ]; then
             echo "::error::Expected 5 draft assets, found $asset_count"
             exit 1
@@ -373,7 +373,7 @@ jobs:
           mkdir -p "$artifact_dir/draft"
           targets=(darwin-arm64 darwin-x64 linux-arm64 linux-x64 windows-x64)
           for target in "${targets[@]}"; do
-            name="browseros-server-resources-${target}.zip"
+            name="slave agent-server-resources-${target}.zip"
             key="artifacts/server/${VERSION}/${name}"
             metadata="$(aws s3api head-object --endpoint-url "$R2_ENDPOINT" --region auto --bucket "$R2_BUCKET" --key "$key" --query Metadata --output json)"
             if ! jq -e \
@@ -417,7 +417,7 @@ jobs:
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git tag -a "$RELEASE_TAG" -m "BrowserOS Server - v$VERSION" "$RELEASE_SHA"
+            git tag -a "$RELEASE_TAG" -m "Slave Agent Server - v$VERSION" "$RELEASE_SHA"
             git push origin "refs/tags/$RELEASE_TAG"
           fi
 
@@ -428,7 +428,7 @@ jobs:
           set -euo pipefail
           targets=(darwin-arm64 darwin-x64 linux-arm64 linux-x64 windows-x64)
           for target in "${targets[@]}"; do
-            name="browseros-server-resources-${target}.zip"
+            name="slave agent-server-resources-${target}.zip"
             source="artifacts/server/${VERSION}/${name}"
             destination="artifacts/server/latest/${name}"
 
@@ -536,7 +536,7 @@ jobs:
       pull-requests: write
     uses: ./.github/workflows/publish-server-ota.yml
     with:
-      product: browseros
+      product: slave agent
       version: ${{ needs.prepare.outputs.version }}
       release_sha: ${{ needs.prepare.outputs.release_sha }}
       snapshot_path: updates/server/appcast-server.alpha.xml
@@ -569,8 +569,8 @@ jobs:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           set -euo pipefail
-          package_json="packages/browseros-agent/apps/server/package.json"
-          lock="packages/browseros-agent/bun.lock"
+          package_json="packages/slave agent-agent/apps/server/package.json"
+          lock="packages/slave agent-agent/bun.lock"
           branch="chore-bump-server-v${VERSION}"
           git fetch origin "$DEFAULT_BRANCH" --no-tags
           git checkout -B "$DEFAULT_BRANCH" "origin/$DEFAULT_BRANCH"
@@ -582,7 +582,7 @@ jobs:
               exit 0
             fi
           fi
-          uv run --directory packages/browseros browseros release component stamp \
+          uv run --directory packages/slave agent slave agent release component stamp \
             --component server \
             --version "$VERSION"
           if git diff --quiet -- "$package_json" "$lock"; then exit 0; fi
@@ -592,7 +592,7 @@ jobs:
               pr_url="$(gh pr create --title "chore: bump server version to ${VERSION}" --body "Reflects the published agent-server/v${VERSION} resources." --base "$DEFAULT_BRANCH" --head "$branch")"
             fi
             head_sha="$(gh pr view "$pr_url" --json headRefOid --jq '.headRefOid')"
-            packages/browseros-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"
+            packages/slave agent-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -603,4 +603,4 @@ jobs:
           head_sha="$(git rev-parse HEAD)"
           git push origin "$branch"
           pr_url="$(gh pr create --title "chore: bump server version to ${VERSION}" --body "Reflects the published agent-server/v${VERSION} resources." --base "$DEFAULT_BRANCH" --head "$branch")"
-          packages/browseros-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"
+          packages/slave agent-agent/scripts/release/merge-release-pr.sh "$pr_url" "$head_sha"

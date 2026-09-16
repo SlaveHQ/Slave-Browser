@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Explicit version; agent and BrowserOS neo allocate one when omitted"
+        description: "Explicit version; agent and Slave Agent neo allocate one when omitted"
         required: false
         type: string
         default: ""
@@ -45,7 +45,7 @@ on:
   workflow_call:
     inputs:
       version:
-        description: "Explicit version; agent and BrowserOS neo allocate one when omitted"
+        description: "Explicit version; agent and Slave Agent neo allocate one when omitted"
         required: false
         type: string
         default: ""
@@ -100,9 +100,9 @@ on:
         required: true
       R2_BUCKET:
         required: true
-      BROWSEROS_AGENT_V2_KEY:
+      SLAVEAGENT_AGENT_V2_KEY:
         required: false
-      BROWSEROS_CONTROLLER_KEY:
+      SLAVEAGENT_CONTROLLER_KEY:
         required: false
       BUGREPORTER_KEY:
         required: false
@@ -212,7 +212,7 @@ jobs:
 
       - name: Resolve extension release
         id: release
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
           EVENT_NAME: ${{ github.event_name }}
@@ -240,16 +240,16 @@ jobs:
             )
             if [ -z "$REQUESTED_VERSION" ]; then
               args+=(
-                --manifest https://cdn.browseros.com/extensions/bundled-manifest.xml
-                --manifest https://cdn.browseros.com/extensions/update-manifest.alpha.xml
-                --manifest https://cdn.browseros.com/extensions/update-manifest.xml
+                --manifest https://cdn.slave agent.com/extensions/bundled-manifest.xml
+                --manifest https://cdn.slave agent.com/extensions/update-manifest.alpha.xml
+                --manifest https://cdn.slave agent.com/extensions/update-manifest.xml
               )
             fi
-            uv run browseros release component resolve "${args[@]}"
+            uv run slave agent release component resolve "${args[@]}"
           else
             records="${RUNNER_TEMP}/explicit-extension-records.json"
             echo '[]' > "$records"
-            uv run browseros ext resolve-version \
+            uv run slave agent ext resolve-version \
               --name "$EXTENSION" \
               --source-sha "$release_sha" \
               --release-records "$records" \
@@ -273,19 +273,19 @@ jobs:
             notes="${RUNNER_TEMP}/extension-${NAME}-notes.md"
             case "$NAME" in
               agent)
-                TITLE="BrowserOS Agent Extension - v$VERSION"
-                SCOPE="packages/browseros-agent/apps/app"
+                TITLE="Slave Agent Agent Extension - v$VERSION"
+                SCOPE="packages/slave agent-agent/apps/app"
                 ;;
               browserclaw)
-                TITLE="BrowserOS neo Extension - v$VERSION"
-                SCOPE="packages/browseros-agent/apps/claw-app"
+                TITLE="Slave Agent neo Extension - v$VERSION"
+                SCOPE="packages/slave agent-agent/apps/claw-app"
                 ;;
               controller)
-                TITLE="BrowserOS Controller Extension - v$VERSION"
+                TITLE="Slave Agent Controller Extension - v$VERSION"
                 SCOPE=""
                 ;;
               bugreporter)
-                TITLE="BrowserOS Bug Reporter Extension - v$VERSION"
+                TITLE="Slave Agent Bug Reporter Extension - v$VERSION"
                 SCOPE=""
                 ;;
             esac
@@ -300,7 +300,7 @@ jobs:
                   echo "No changes in $SCOPE since $previous." > "$changelog"
                 fi
               fi
-              node packages/browseros-agent/scripts/release/cap-release-changelog.mjs \
+              node packages/slave agent-agent/scripts/release/cap-release-changelog.mjs \
                 --input "$changelog" \
                 --output "$notes" \
                 --max-entries 15 \
@@ -389,18 +389,18 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version-file: packages/browseros-agent/package.json
+          bun-version-file: packages/slave agent-agent/package.json
 
       - name: Stamp in-repository extension version
         if: ${{ inputs.extension == 'agent' || inputs.extension == 'browserclaw' }}
-        working-directory: packages/browseros
-        run: uv run browseros release component stamp --component "$EXTENSION" --version "$VERSION"
+        working-directory: packages/slave agent
+        run: uv run slave agent release component stamp --component "$EXTENSION" --version "$VERSION"
 
       - name: Verify Chrome is available
         run: google-chrome --version
 
       - name: Build and upload immutable extension CRX
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           BRANCH: ${{ inputs.branch || '' }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -408,8 +408,8 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
-          BROWSEROS_AGENT_V2_KEY: ${{ secrets.BROWSEROS_AGENT_V2_KEY }}
-          BROWSEROS_CONTROLLER_KEY: ${{ secrets.BROWSEROS_CONTROLLER_KEY }}
+          SLAVEAGENT_AGENT_V2_KEY: ${{ secrets.SLAVEAGENT_AGENT_V2_KEY }}
+          SLAVEAGENT_CONTROLLER_KEY: ${{ secrets.SLAVEAGENT_CONTROLLER_KEY }}
           BUGREPORTER_KEY: ${{ secrets.BUGREPORTER_KEY }}
           BROWSERCLAW_KEY: ${{ secrets.BROWSERCLAW_KEY }}
           POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
@@ -421,7 +421,7 @@ jobs:
           VITE_PUBLIC_POSTHOG_HOST: ${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
           VITE_CLAW_POSTHOG_KEY: ${{ secrets.VITE_CLAW_POSTHOG_KEY }}
           VITE_CLAW_POSTHOG_HOST: ${{ secrets.VITE_CLAW_POSTHOG_HOST }}
-          VITE_PUBLIC_BROWSEROS_API: https://api.browseros.com
+          VITE_PUBLIC_SLAVEAGENT_API: https://api.slave agent.com
           NODE_ENV: production
         run: |
           set -euo pipefail
@@ -432,7 +432,7 @@ jobs:
           if [ -n "$BRANCH" ]; then
             args+=(--branch "$BRANCH")
           fi
-          uv run browseros ext release "${args[@]}"
+          uv run slave agent ext release "${args[@]}"
 
       - name: Attach CRX assets
         env:
@@ -443,7 +443,7 @@ jobs:
           for NAME in $NAMES; do
             TAG="ext-${NAME}/v${VERSION}"
             asset="${NAME}-${VERSION}.crx"
-            path="packages/browseros/build/extensions/dist/${asset}"
+            path="packages/slave agent/build/extensions/dist/${asset}"
             if [ ! -f "$path" ]; then
               echo "::error::Missing built extension artifact $path"
               exit 1
@@ -468,7 +468,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: extension-release-${{ inputs.extension }}-${{ needs.prepare.outputs.version }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: packages/browseros/build/extensions/dist/*.crx
+          path: packages/slave agent/build/extensions/dist/*.crx
           if-no-files-found: error
           retention-days: 30
 
@@ -499,7 +499,7 @@ jobs:
 
       - name: Preflight alpha feed update
         id: render
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -527,7 +527,7 @@ jobs:
             echo "No selected extension is registered in the alpha update feed"
             exit 0
           fi
-          uv run browseros release extensions "${args[@]}"
+          uv run slave agent release extensions "${args[@]}"
           echo "should_publish=true" >> "$GITHUB_OUTPUT"
 
   finalize:
@@ -554,7 +554,7 @@ jobs:
         uses: astral-sh/setup-uv@v8.3.2
 
       - name: Verify prepared extension release
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           GH_TOKEN: ${{ github.token }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -564,7 +564,7 @@ jobs:
         run: |
           set -euo pipefail
           canonical_dir="${RUNNER_TEMP}/canonical-extension-assets"
-          uv run browseros ext verify \
+          uv run slave agent ext verify \
             --version "$VERSION" \
             --name "$EXTENSION" \
             --source-sha "$RELEASE_SHA" \
@@ -627,10 +627,10 @@ jobs:
               continue
             fi
             case "$NAME" in
-              agent) TITLE="BrowserOS Agent Extension - v$VERSION" ;;
-              browserclaw) TITLE="BrowserOS neo Extension - v$VERSION" ;;
-              controller) TITLE="BrowserOS Controller Extension - v$VERSION" ;;
-              bugreporter) TITLE="BrowserOS Bug Reporter Extension - v$VERSION" ;;
+              agent) TITLE="Slave Agent Agent Extension - v$VERSION" ;;
+              browserclaw) TITLE="Slave Agent neo Extension - v$VERSION" ;;
+              controller) TITLE="Slave Agent Controller Extension - v$VERSION" ;;
+              bugreporter) TITLE="Slave Agent Bug Reporter Extension - v$VERSION" ;;
             esac
             git tag -a "$TAG" -m "$TITLE" "$RELEASE_SHA"
             refs+=("refs/tags/$TAG")
@@ -681,7 +681,7 @@ jobs:
         uses: astral-sh/setup-uv@v8.3.2
 
       - name: Render alpha feeds from current committed and live state
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -695,7 +695,7 @@ jobs:
               agent|bugreporter|browserclaw) args+=(--set "$NAME=$VERSION") ;;
             esac
           done
-          uv run browseros release extensions "${args[@]}"
+          uv run slave agent release extensions "${args[@]}"
 
       - name: Persist exact alpha feed snapshots
         env:
@@ -708,13 +708,13 @@ jobs:
             updates/extensions/extensions.alpha.json
             updates/extensions/bundled-manifest.xml
           )
-          packages/browseros-agent/scripts/release/commit-update-snapshot.sh \
+          packages/slave agent-agent/scripts/release/commit-update-snapshot.sh \
             "$DEFAULT_BRANCH" \
             "chore(release): update extension alpha feeds to ${VERSION}" \
             "${paths[@]}"
 
       - name: Publish committed alpha feeds
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -722,7 +722,7 @@ jobs:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
         run: |
           set -euo pipefail
-          uv run browseros release feeds publish-local \
+          uv run slave agent release feeds publish-local \
             extensions/update-manifest.alpha.xml \
             extensions/extensions.alpha.json \
             extensions/bundled-manifest.xml \
@@ -751,7 +751,7 @@ jobs:
       - uses: astral-sh/setup-uv@v8.3.2
 
       - name: Reflect released extension versions on main
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
           GH_TOKEN: ${{ github.token }}
@@ -763,11 +763,11 @@ jobs:
           paths=()
           for name in $NAMES; do
             case "$name" in
-              agent) manifest="packages/browseros-agent/apps/app/package.json" ;;
-              browserclaw) manifest="packages/browseros-agent/apps/claw-app/package.json" ;;
+              agent) manifest="packages/slave agent-agent/apps/app/package.json" ;;
+              browserclaw) manifest="packages/slave agent-agent/apps/claw-app/package.json" ;;
               *) continue ;;
             esac
-            current="$(uv run browseros release component read --component "$name")"
+            current="$(uv run slave agent release component read --component "$name")"
             if [ "$current" != "$VERSION" ]; then
               newest="$(printf '%s\n%s\n' "$current" "$VERSION" | sort -V | tail -n 1)"
               if [ "$newest" = "$current" ]; then
@@ -775,8 +775,8 @@ jobs:
                 continue
               fi
             fi
-            uv run browseros release component stamp --component "$name" --version "$VERSION"
-            paths+=("$manifest" "packages/browseros-agent/bun.lock")
+            uv run slave agent release component stamp --component "$name" --version "$VERSION"
+            paths+=("$manifest" "packages/slave agent-agent/bun.lock")
           done
 
           if [ "${#paths[@]}" -eq 0 ] || git -C "$GITHUB_WORKSPACE" diff --quiet -- "${paths[@]}"; then
@@ -796,7 +796,7 @@ jobs:
                 --head "$branch")"
             fi
             head_sha="$(gh pr view "$pr_url" --json headRefOid --jq '.headRefOid')"
-            "$GITHUB_WORKSPACE/packages/browseros-agent/scripts/release/merge-release-pr.sh" "$pr_url" "$head_sha"
+            "$GITHUB_WORKSPACE/packages/slave agent-agent/scripts/release/merge-release-pr.sh" "$pr_url" "$head_sha"
             exit 0
           fi
 
@@ -812,4 +812,4 @@ jobs:
             --body "Reflects the published extension release at version ${VERSION}." \
             --base "$DEFAULT_BRANCH" \
             --head "$branch")"
-          "$GITHUB_WORKSPACE/packages/browseros-agent/scripts/release/merge-release-pr.sh" "$pr_url" "$head_sha"
+          "$GITHUB_WORKSPACE/packages/slave agent-agent/scripts/release/merge-release-pr.sh" "$pr_url" "$head_sha"

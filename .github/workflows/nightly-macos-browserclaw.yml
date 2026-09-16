@@ -1,4 +1,4 @@
-name: "Nightly: BrowserOS neo (macOS arm64)"
+name: "Nightly: Slave Agent neo (macOS arm64)"
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   transaction:
-    name: Freeze and reserve BrowserOS neo transaction
+    name: Freeze and reserve Slave Agent neo transaction
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -44,7 +44,7 @@ jobs:
 
       - name: Reconcile product transaction
         id: transaction
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           GH_TOKEN: ${{ github.token }}
@@ -61,7 +61,7 @@ jobs:
           fi
           source_sha="$(git rev-parse HEAD)"
           test "$source_sha" = "$GITHUB_SHA"
-          uv run browseros release suite reconcile \
+          uv run slave agent release suite reconcile \
             --mode nightly \
             --product browserclaw \
             --source-sha "$source_sha" \
@@ -75,7 +75,7 @@ jobs:
           fi
 
   prepare-claw-server:
-    name: Prepare exact BrowserOS neo server
+    name: Prepare exact Slave Agent neo server
     needs: transaction
     uses: ./.github/workflows/release-claw-server.yml
     permissions:
@@ -91,7 +91,7 @@ jobs:
     secrets: inherit
 
   prepare-browserclaw:
-    name: Prepare exact BrowserOS neo extension
+    name: Prepare exact Slave Agent neo extension
     needs: transaction
     uses: ./.github/workflows/release-extensions.yml
     permissions:
@@ -108,7 +108,7 @@ jobs:
     secrets: inherit
 
   verify-components:
-    name: Verify exact prepared BrowserOS neo components
+    name: Verify exact prepared Slave Agent neo components
     needs: [transaction, prepare-claw-server, prepare-browserclaw]
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -128,7 +128,7 @@ jobs:
           test "$EXTENSION_VERSION" = "${{ needs.transaction.outputs.browserclaw_version }}"
 
   build-browserclaw:
-    name: Build signed BrowserOS neo nightly
+    name: Build signed Slave Agent neo nightly
     needs: [transaction, verify-components]
     uses: ./.github/workflows/reusable-build-macos-nightly.yml
     permissions:
@@ -145,7 +145,7 @@ jobs:
     secrets: inherit
 
   finalize-claw-server:
-    name: Finalize exact BrowserOS neo server
+    name: Finalize exact Slave Agent neo server
     needs: [transaction, build-browserclaw]
     uses: ./.github/workflows/release-claw-server.yml
     permissions:
@@ -160,7 +160,7 @@ jobs:
     secrets: inherit
 
   finalize-browserclaw:
-    name: Finalize exact BrowserOS neo extension
+    name: Finalize exact Slave Agent neo extension
     needs: [transaction, build-browserclaw]
     uses: ./.github/workflows/release-extensions.yml
     permissions:
@@ -176,7 +176,7 @@ jobs:
     secrets: inherit
 
   claw-server-ota:
-    name: Assemble BrowserOS neo server alpha snapshot
+    name: Assemble Slave Agent neo server alpha snapshot
     needs: [transaction, finalize-claw-server]
     uses: ./.github/workflows/publish-server-ota.yml
     permissions:
@@ -191,7 +191,7 @@ jobs:
     secrets: inherit
 
   publish:
-    name: Merge and publish BrowserOS neo nightly
+    name: Merge and publish Slave Agent neo nightly
     needs: [transaction, build-browserclaw, finalize-claw-server, finalize-browserclaw, claw-server-ota]
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -218,11 +218,11 @@ jobs:
 
       - name: Recover product transaction
         id: recovery
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         run: |
           set -euo pipefail
           record="$RUNNER_TEMP/release-suite.json"
-          uv run browseros release suite inspect \
+          uv run slave agent release suite inspect \
             --mode nightly \
             --product browserclaw \
             --source-sha "$SOURCE_SHA" \
@@ -269,7 +269,7 @@ jobs:
 
       - name: Render shared extension feeds with the selected product pin
         if: steps.recovery.outputs.state == 'open'
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           EXTENSION_VERSION: ${{ needs.transaction.outputs.browserclaw_version }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -278,21 +278,21 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          uv run browseros release extensions \
+          uv run slave agent release extensions \
             --channel alpha \
             --baseline-root "$GITHUB_WORKSPACE/updates" \
             --set "browserclaw=$EXTENSION_VERSION"
 
       - name: Reconcile and merge product state
         if: steps.recovery.outputs.state == 'open'
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           BASE_SHA: ${{ steps.baseline.outputs.sha }}
         run: |
           set -euo pipefail
           record="$RUNNER_TEMP/release-suite.json"
           gate="$RUNNER_TEMP/release-suite-gate.json"
-          uv run browseros release suite reconcile \
+          uv run slave agent release suite reconcile \
             --mode nightly \
             --product browserclaw \
             --source-sha "$SOURCE_SHA" \
@@ -303,7 +303,7 @@ jobs:
             --state-root "$GITHUB_WORKSPACE" \
             --output "$record"
           jq '{
-            schema: "browseros-release-suite-gate-v1",
+            schema: "slave agent-release-suite-gate-v1",
             passed: true,
             transaction_id,
             source_sha,
@@ -313,20 +313,20 @@ jobs:
             state_checksums,
             products: ["browserclaw"]
           }' "$record" > "$gate"
-          uv run browseros release suite merge \
+          uv run slave agent release suite merge \
             --record "$record" \
             --gate "$gate" \
             --repo "$GITHUB_REPOSITORY"
 
       - name: Verify merged transaction and restore current committed feeds
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         run: |
           set -euo pipefail
           record="$RUNNER_TEMP/release-suite.json"
           test "$(jq -r '.state' "$record")" = "merged"
           merge_sha="$(jq -r '.merge_sha' "$record")"
           [[ "$merge_sha" =~ ^[0-9a-fA-F]{40}$ ]]
-          uv run browseros release suite inspect \
+          uv run slave agent release suite inspect \
             --mode nightly \
             --product browserclaw \
             --source-sha "$SOURCE_SHA" \
@@ -349,7 +349,7 @@ jobs:
             updates/server/appcast-claw-server.alpha.xml
 
       - name: Publish immutable signed browser artifact
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -357,13 +357,13 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          uv run browseros release suite publish-browser-artifact \
+          uv run slave agent release suite publish-browser-artifact \
             --record "$RUNNER_TEMP/release-suite.json" \
             --product browserclaw \
             --artifact-root "$RUNNER_TEMP/nightly-browserclaw"
 
       - name: Publish current committed product feeds
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -371,7 +371,7 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          uv run browseros release feeds publish-local \
+          uv run slave agent release feeds publish-local \
             server/appcast-claw-server.alpha.xml \
             extensions/update-manifest.alpha.xml \
             extensions/extensions.alpha.json \
@@ -379,23 +379,23 @@ jobs:
             --publish
 
       - name: Reconcile product rolling nightly release
-        working-directory: packages/browseros
+        working-directory: packages/slave agent
         env:
           VERSION: ${{ needs.transaction.outputs.browser_version }}
         run: |
           set -euo pipefail
           # Immutable bytes and committed feeds precede the retryable rolling
           # release saga. A newer product tag is preserved by its source checks.
-          uv run browseros release suite reconcile-rolling-release \
+          uv run slave agent release suite reconcile-rolling-release \
             --tag nightly-browserclaw \
-            --title "BrowserOS neo Nightly (signed macOS arm64)" \
+            --title "Slave Agent neo Nightly (signed macOS arm64)" \
             --source-sha "$SOURCE_SHA" \
             --browser-version "$VERSION" \
             --artifact-root "$RUNNER_TEMP/nightly-browserclaw" \
             --repo "$GITHUB_REPOSITORY"
 
   notify-failure:
-    name: Notify BrowserOS neo nightly failure
+    name: Notify Slave Agent neo nightly failure
     if: ${{ always() && contains(needs.*.result, 'failure') }}
     needs:
       - transaction
@@ -415,6 +415,6 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then exit 0; fi
-          payload="$(jq -cn --arg url "$RUN_URL" '{text: (":x: BrowserOS neo nightly failed — " + $url)}')"
+          payload="$(jq -cn --arg url "$RUN_URL" '{text: (":x: Slave Agent neo nightly failed — " + $url)}')"
           curl -fsS -X POST -H 'Content-type: application/json' \
             --data "$payload" "$SLACK_WEBHOOK_URL"

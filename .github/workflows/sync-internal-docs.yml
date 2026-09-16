@@ -62,8 +62,8 @@ jobs:
           fi
 
           BRANCH="bot/sync-internal-docs-$(date -u +%Y%m%d-%H%M%S)"
-          git config user.name  "browseros-bot"
-          git config user.email "bot@browseros.ai"
+          git config user.name  "slave agent-bot"
+          git config user.email "bot@slave agent.ai"
           git checkout -b "$BRANCH"
           git add .internal-docs
           git commit -m "chore: sync internal-docs submodule"
